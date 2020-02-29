@@ -1,0 +1,41 @@
+{
+  "expo": {
+    "name": "TNPFC",
+    "slug": "TNPFC",
+    "privacy": "public",
+    "sdkVersion": "36.0.0",
+    "platforms": [
+      "ios",
+      "android",
+      "web"
+    ],
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/logo.png",
+    "primaryColor": "#cc0000",
+    "splash": {
+      "image": "./assets/splash.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#ffffff"
+    },
+    "updates": {
+      "fallbackToCacheTimeout": 0
+    },
+    "assetBundlePatterns": [
+      "**/*"
+    ],
+    "androidStatusBar": {
+      "barStyle": "light-content",
+      "backgroundColor": "#ffffff"
+    },
+    "android": {
+      "package": "com.tnpfc.mobile",
+      "versionCode": 1
+    },
+    "ios": {
+      "bundleIdentifier": "com.tnpfc.mobile",
+      "buildNumber": "1.0.0",
+      "supportsTablet": true
+    }
+  }
+}
