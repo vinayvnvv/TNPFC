@@ -57,13 +57,13 @@ class FDDetails extends React.Component {
             fetchCustomerNominees,
             fetchFDSummary,
             fetchFdLoans,
-            // fdLoans,
+            fdLoans,
             customerNominee,
-            fdSummary,
+            // fdSummary,
             route: {params: {selectedDeposite = {}} = {}}
         } = this.props;
-        if(!fdSummary) await fetchFDSummary(selectedDeposite.accountNumber);
-        await fetchFdLoans();
+        await fetchFDSummary(selectedDeposite.accountNumber);
+        if(!fdLoans) await fetchFdLoans();
         if(!customerNominee) await fetchCustomerNominees();
         this.setState({pageInit: true});
     }
