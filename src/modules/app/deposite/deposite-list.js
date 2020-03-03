@@ -1,6 +1,6 @@
 import React from 'react';
 import {connect} from 'react-redux';
-import { Container, Text, Button, Icon, Left, Right, Header, Body, Title, ListItem} from 'native-base';
+import { Container, Text, Button, Icon, Left, Right, Header, Body, Title} from 'native-base';
 import {
     SafeAreaView,
     TouchableOpacity,
@@ -13,19 +13,22 @@ import { CONFIG } from '../../../../config';
 import {fetchAllDeposites} from './../../../store/actions/deposite-actions';
 import utils from '../../../services/utils';
 import icons from '../../../../assets/icons';
+import { NAVIGATION } from '../../../navigation';
 
 const {THEME} = CONFIG.APP;
 
 const Item = ({
+    data,
     data: {
         productAliasName,
         openDate,
         maturityDate,
         accountStatus,
     } = {},
+    onPress,
 }) => (
     <View style={styles.listItemContainer}>
-        <TouchableOpacity activeOpacity={0.9}>
+        <TouchableOpacity activeOpacity={0.9} onPress={() => onPress(data)}>
             <View style={styles.listItem}>
                 <View style={styles.listItemTop}>
                     <Text style={styles.listItemTitle}>Schema Name</Text>
@@ -80,6 +83,10 @@ export class DepositeList extends React.Component {
         const {navigation} = this.props;
         navigation.goBack();
     }
+    onPress = data => {
+        const {navigation} = this.props;
+        navigation.navigate(NAVIGATION.FD_DETAILS, {selectedDeposite: data});
+    }
     getHeaderList = data => {
         const all = data && data.length ? data.length : 0;
         let matured = 0;
@@ -121,6 +128,7 @@ export class DepositeList extends React.Component {
                             renderItem={({ item }) => (
                             <Item
                                 data={item}
+                                onPress={this.onPress}
                             />
                             )}
                             keyExtractor={item => item.accountNumber}
@@ -166,7 +174,7 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'center',
         borderRadius: 3,
-        paddingVertical: 7,
+        paddingVertical: 11,
         paddingHorizontal: 5
     },
     headerListItemIcon: {

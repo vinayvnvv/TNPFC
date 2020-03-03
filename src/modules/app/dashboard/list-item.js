@@ -7,7 +7,7 @@ const DashBoardListItem = ({
     onListPress,
     icon,
 }) => (
-    <TouchableOpacity onPress={onListPress}>
+    <TouchableOpacity onPress={onListPress} activeOpacity={0.7}>
         <View style={styles.itemContainer}>
             <Image style={styles.itemIcon} source={icon} />
             <Text style={styles.itemTitle}>{title || 'Title'}</Text>

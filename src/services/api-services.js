@@ -29,5 +29,17 @@ class APIService {
     fetchAllDeposites() {
         return axios.post(HOST + 'getallFdDetails', {customerId: this.customerId}, this.getConfig());
     }
+    fetchCustomerDetails() {
+        return axios.post(HOST + 'getCustomerDetails', {customerId: this.customerId}, this.getConfig());
+    }
+    fetchFDSummary(accountNumber) {
+        return axios.post(HOST + 'getFdSummary', {accountNumber}, this.getConfig());
+    }
+    fetchCustomerNominees() {
+        return axios.post(HOST + 'getCustomerNominees', {customerId: this.customerId}, this.getConfig());
+    }
+    fetchFdLoans() {
+        return axios.post(HOST + 'getFdLoans', {customerId: this.customerId}, this.getConfig());
+    }
 }
 export default new APIService();

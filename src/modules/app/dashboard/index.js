@@ -1,10 +1,19 @@
 import React from 'react';
+import {connect} from 'react-redux';
 import { Button, Icon, Left, Right, Header, Container, Body, Title } from 'native-base';
 import { CONFIG } from '../../../../config';
 import {View, StyleSheet, ScrollView} from 'react-native';
 import DashBoardListItem from './list-item';
 import { NAVIGATION } from '../../../navigation';
 import icons from '../../../../assets/icons';
+import {removeAuth} from './../../../store/actions/auth-actions';
+import {
+    Menu,
+    MenuOptions,
+    MenuOption,
+    MenuTrigger,
+} from 'react-native-popup-menu';
+import authServices from '../../../services/authServices';
 
 
 const lists = [
@@ -17,15 +26,26 @@ const lists = [
     {name: 'Application Status', icon: icons.AppStatusIcon},
     {name: 'Service Request', icon: icons.ServiceReqIcon},
     {name: 'Reports', icon: icons.ReportsIcon},
+];
+
+const menus = [
+    {title: 'Profile'}, {title: 'Logout'},
 ]
 
 
 class DashBoard extends React.Component {
     onListPress = name => {
         const {navigation} = this.props;
-        console.log('onListPress', name, navigation);
         if(navigation && name) {
             navigation.navigate(name);
+        }
+    }
+    onDropDownSelect = async type => {
+        const {navigation, removeAuth} = this.props;
+        if(type === menus[0].title) navigation.navigate(NAVIGATION.PROFILE);
+        if(type === menus[1].title) {
+            await authServices.removeAuth();
+            removeAuth();
         }
     }
     render() {
@@ -41,7 +61,19 @@ class DashBoard extends React.Component {
                             <Icon name='notifications-outline' />
                         </Button>
                         <Button transparent>
-                            <Icon name='settings' />
+                            <Menu>
+                                <MenuTrigger>
+                                    <Icon style={{color: '#ffffff'}} name='settings' />
+                                </MenuTrigger>
+                                <MenuOptions customStyles={optionsStyles}>
+                                    {menus.map((m, idx) =>
+                                        <MenuOption 
+                                            key={'menu-' + idx} 
+                                            onSelect={() => this.onDropDownSelect(m.title)} 
+                                            text={m.title} />
+                                    )}
+                                </MenuOptions>
+                            </Menu>
                         </Button>
                     </Right>
                 </Header>
@@ -76,7 +108,19 @@ const styles = StyleSheet.create({
         width: '50%',
         padding: 12,
     },
-})
+});
+const optionsStyles = {
+    optionsContainer: {
+        maxWidth: 100,
+    },
+    optionWrapper: {
+      paddingHorizontal: 9,
+      paddingVertical: 13,
+    },
+  };
 
 
-export default DashBoard
+export default connect(
+    null,
+    {removeAuth}
+)(DashBoard);

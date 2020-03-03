@@ -9,6 +9,7 @@ import vars from './native-base-theme/variables/commonColor';
 import * as Font from 'expo-font';
 import { Ionicons } from '@expo/vector-icons';
 import { store, persistor } from './src/store';
+import { MenuProvider } from 'react-native-popup-menu';
 
 const Loading = () => (
   <View>
@@ -36,11 +37,13 @@ class App extends React.Component {
       <Provider store={store}>
         <PersistGate loading={null} persistor={persistor}>
           {this.state.isReady ? (
-              <StyleProvider style={getTheme(vars)}>
-                <Root>
-                    <Index />
-                </Root>
-              </StyleProvider>
+              <MenuProvider>
+                  <StyleProvider style={getTheme(vars)}>
+                    <Root>
+                        <Index />
+                    </Root>
+                </StyleProvider>
+              </MenuProvider>
           ) : (
             <Loading />
           )}

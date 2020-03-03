@@ -1,12 +1,14 @@
 import React from 'react';
-import { View, AsyncStorage, StyleSheet, TextInput, Text, StatusBar } from 'react-native';
-import {Button, Toast, Container, Header, Content, Spinner} from 'native-base';
+import { View, AsyncStorage, StyleSheet, TextInput, StatusBar, ScrollView, Image } from 'react-native';
+import {Button, Toast, Container, Header, Spinner, Text, Icon, Left, Body, Title, Item, Input, Label, Content} from 'native-base';
 import {connect} from 'react-redux';
 import { save } from '../../store/actions/test-actions';
 import { setAuth } from '../../store/actions/auth-actions';
 import authServices from '../../services/authServices';
 import { CONFIG } from '../../../config';
 import apiServices from '../../services/api-services';
+import icons from '../../../assets/icons';
+import utils from '../../services/utils';
 const {THEME} = CONFIG.APP;
 
 const resendTime = 12000;
@@ -24,6 +26,7 @@ class Login extends React.Component {
         timer,
         otpTextFieldValue: '',
         verifying: false,
+        otpSending: false,
     }
     intervalCouter;
     timeoutInstance;
@@ -61,6 +64,7 @@ class Login extends React.Component {
     }
     sendOTP = async () => {
         console.log('send')
+        this.setState({otpSending: true});
         const {panNumber} = this.state;
         if(panNumber !== '') {
             console.log('send', panNumber);
@@ -101,12 +105,14 @@ class Login extends React.Component {
                         type: "danger"
                     });
                 }
+                this.setState({otpSending: false});
             }).catch(err => {
                 Toast.show({
                     text: 'error in network',
                     buttonText: "Okay",
                     duration: 3000,
                 });
+                this.setState({otpSending: false});
             })
         }
         // await authServices.setAuth('sdsd');
@@ -167,84 +173,166 @@ class Login extends React.Component {
         }
     }
     render() {
-        const {panNumber, otpSent, canReSendOtp, timer, otpTextFieldValue, verifying} = this.state;
+        const {panNumber, otpSent, canReSendOtp, timer, otpTextFieldValue, verifying, otpSending} = this.state;
         return(
-            <Container style={{height: '100%'}}>
-                <View style={styles.container}>
-                    <StatusBar backgroundColor={THEME.PRIMARY}/>
-                    <Text style={styles.title}>Log In</Text>
-                    <Text style={styles.subTitle}>Enter below details to proceed forward</Text>
-                    <View style={styles.formRow}>
-                        <Text style={styles.formRowLabel} >PAN / Aadhar Number</Text>
-                        <TextInput 
-                            style={styles.formRowField} 
-                            value={panNumber} 
-                            onChangeText={(text) => this.onFieldChange('panNumber', text)} />
-                    </View>
-                    {otpSent && (
-                        <View style={styles.formRow}>
-                            <Text style={styles.formRowLabel} >Enter OTP</Text>
-                            <TextInput 
-                                style={styles.formRowField} 
-                                onChangeText={(text) => this.onFieldChange('otpTextFieldValue', text)}
-                                value={otpTextFieldValue}/>
+            <Container style={{backgroundColor: '#fff'}}>
+                <StatusBar backgroundColor={THEME.PRIMARY}/>
+                <Header noLeft>
+                    <Left />
+                <Body>
+                    <Title>{'Sign In / Sign Up'}</Title>
+                </Body>
+                </Header>
+                <ScrollView>
+                    <Content>
+                        <View style={styles.headerContainerOuter}>
+                            <View style={styles.backdrop}/>
+                            <View style={styles.headerContainer}>
+                                <Image 
+                                    source={icons.LoginWelcomeIcon} 
+                                    style={styles.headerContainerImage}/>
+                                <Text style={styles.headerContainerTitle}>Login to {CONFIG.APP.TITLE}</Text>
+                                <Text style={styles.headerContainerSub}>
+                                    Do not provide your credentials anywhere other than in this page
+                                </Text>
+                            </View>
                         </View>
-                    )}
-                    {otpSent && canReSendOtp && (
-                        <View style={styles.otpSection}>
-                            <Button small transparent onPress={() => this.sendOTP()}>
-                                <Text style={styles.otpBtn}>Resend OTP</Text>
-                            </Button>
+                        <View style={styles.containerOuter}>
+                            <View style={styles.container}>
+                                <Text style={styles.title}>Login</Text>
+                                <View style={styles.formRow}>
+                                    {/* <Text style={styles.formRowLabel} >PAN / Aadhar Number</Text> */}
+                                    <Item floatingLabel>
+                                        <Label>PAN / Aadhar Number</Label>
+                                        <Input 
+                                            value={panNumber} 
+                                            onChangeText={(text) => this.onFieldChange('panNumber', text)} />
+                                        <Icon active name='person' />
+                                    </Item>
+                                    {/* <TextInput 
+                                        style={styles.formRowField} 
+                                        value={panNumber} 
+                                        onChangeText={(text) => this.onFieldChange('panNumber', text)} /> */}
+                                </View>
+                                {otpSent && (
+                                    <View style={styles.formRow}>
+                                        {/* <Text style={styles.formRowLabel} >Enter OTP</Text> */}
+                                        <Item floatingLabel>
+                                            <Label>Enter OTP</Label>
+                                            <Input 
+                                                onChangeText={(text) => this.onFieldChange('otpTextFieldValue', text)}
+                                                value={otpTextFieldValue}
+                                                placeholder='Icon Alignment in Textbox'/>
+                                            <Icon active name='lock' />
+                                        </Item>
+                                        {/* <TextInput 
+                                            style={styles.formRowField} 
+                                            onChangeText={(text) => this.onFieldChange('otpTextFieldValue', text)}
+                                            value={otpTextFieldValue}/> */}
+                                    </View>
+                                )}
+                                {otpSent && canReSendOtp && (
+                                    <View style={styles.otpSection}>
+                                        <Button small transparent onPress={() => this.sendOTP()}>
+                                            <Text style={styles.otpBtn}>Resend OTP</Text>
+                                        </Button>
+                                    </View>
+                                )}
+                                {otpSent && !canReSendOtp && (
+                                    <View style={styles.otpSection}>
+                                            <Text style={styles.otpBtn}>Resend OTP in {timer}</Text>
+                                    </View>
+                                )}
+                                <View style={styles.actionSection}>
+                                    {otpSent ? (
+                                        verifying ? (
+                                            <Spinner />
+                                        ) : (
+                                            <Button success block onPress={this.verifyOTP} disabled={verifying}>
+                                                <Text style={styles.loginBtn}>Login</Text>
+                                            </Button>
+                                        ) 
+                                    ) : (
+                                        otpSending ? (
+                                            <Spinner />
+                                        ) : (
+                                            <Button success block onPress={this.sendOTP}>
+                                                <Text style={styles.loginBtn}>Get Otp</Text>
+                                            </Button>
+                                        )
+                                    )}
+                                    
+                                </View>
+                            </View>
                         </View>
-                    )}
-                    {otpSent && !canReSendOtp && (
-                        <View style={styles.otpSection}>
-                                <Text style={styles.otpBtn}>Resend OTP in {timer}</Text>
-                        </View>
-                    )}
-                    <View style={styles.actionSection}>
-                        {otpSent ? (
-                            verifying ? (
-                                <Spinner />
-                            ) : (
-                                <Button warning block onPress={this.verifyOTP} disabled={verifying}>
-                                    <Text style={styles.loginBtn}>Login</Text>
-                                </Button>
-                            ) 
-                        ) : (
-                            <Button warning block onPress={this.sendOTP}>
-                                <Text style={styles.loginBtn}>Get Otp</Text>
-                            </Button>
-                        )}
-                        
-                    </View>
-                </View>
+                    </Content>
+                </ScrollView>
+                
             </Container>
         )
     }
 }
 
 const styles = StyleSheet.create({
-    container: {
-        flexDirection: 'column',
-        justifyContent: "center",
-        alignItems: "center",
-        height: '100%',
+    headerContainer: {
         backgroundColor: THEME.PRIMARY,
-        padding: THEME.LAYOUT_PADDING + 21,
+        padding: THEME.LAYOUT_PADDING + 41,
+        flexDirection: 'column',
+        // justifyContent: "center",
+        alignItems: "center",
+        paddingTop: 31,
+        paddingBottom: 91,
+    },
+    headerContainerTitle: {
+        color: THEME.PRIMARY_INVERT,
+        textAlign: 'center',
+        fontWeight: 'bold',
+        fontSize: 14,
+        marginTop: 5,
+    },
+    headerContainerSub: {
+        textAlign: 'center',
+        fontSize: 13,
+        fontWeight: '300',
+        color: '#f9f9f9',
+        marginTop: 9,
+    },
+    headerContainerImage: {
+        width: 62,
+        height: 38,
+        marginBottom: 11,
+    },
+    backdrop: {
+        position: 'absolute',
+        height: 70,
+        backgroundColor: THEME.PRIMARY,
+        bottom: -30,
+        borderRadius: 90,
+        width: '100%',
+    },
+    containerOuter: {
+        paddingVertical: 21,
+        paddingHorizontal: 32,
+        position: 'relative',
+    },
+    container: {
+        ...utils.getBoxShadow(11, '#00000077'),
+        marginTop: -11,
+        flexDirection: 'column',
+        // justifyContent: "center",
+        alignItems: "center",
+        // height: '100%',
+        backgroundColor: '#fff',
+        padding: THEME.LAYOUT_PADDING,
+        position: 'relative',
+        top: -60,
+        borderRadius: 5,
     },
     title: {
-        fontSize: 21,
-        color: THEME.PRIMARY_INVERT,
-        textTransform: "uppercase",
-        fontWeight: 'bold',
-    },
-    subTitle: {
         fontSize: 18,
-        color: THEME.PRIMARY_INVERT,
-        marginTop: 17,
-        marginBottom: 51,
-        textAlign: "center"
+        color: THEME.PRIMARY,
+        marginBottom: 41,
+        // fontWeight: 'bold',
     },
     formRow: {
         flexDirection: 'column',
@@ -267,15 +355,14 @@ const styles = StyleSheet.create({
         width: '100%'
     },
     otpBtn: {
-        color: '#ffffff'
+        color: THEME.PRIMARY
     },
     actionSection: {
         width: '100%',
         marginVertical: 21,
     },
     loginBtn: {
-        color: "#444444",
-        textTransform: 'uppercase',
+        textTransform: 'capitalize',
         fontWeight: '500',
         letterSpacing: 0.7,
         fontSize: 18

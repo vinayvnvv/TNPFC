@@ -17,5 +17,15 @@ class AuthService {
             } 
         })
     }
+    removeAuth() {
+        return new Promise(async (res, rej) => {
+            try {
+                await AsyncStorage.removeItem(this.key);
+                res();
+            } catch(err) {
+                rej();
+            } 
+        })
+    }
 }
 export default new AuthService();

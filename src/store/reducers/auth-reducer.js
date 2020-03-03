@@ -15,6 +15,12 @@ const authReducer = (state = initialState, action) => {
                 token: action.payload.token,
                 customerId: action.payload.customerId,
             }
+        case TYPES.AUTH.REMOVE:
+            return {
+                ...state,
+                token: null,
+                customerId: null,
+            }  
         default: 
             return {
                 ...state,

@@ -4,6 +4,8 @@ const {DEPOSITE} = TYPES;
 // Initial State
 const initialState = {
     depositeList: null,
+    fdSummary: null,
+    fdLoans: null,
 };
 
 const depositeReducer = (state = initialState, action) => {
@@ -22,6 +24,36 @@ const depositeReducer = (state = initialState, action) => {
             return {
                 ...state,
                 depositeList: action.payload
+            }
+        case DEPOSITE.ON_FD_SUMMARY_LOAD:
+            return {
+                ...state,
+                fdSummary: null,
+            }
+        case DEPOSITE.ON_FD_SUMMARY_SUCCESS: 
+            return {
+                ...state,
+                fdSummary: action.payload
+            }
+        case DEPOSITE.ON_FD_SUMMARY_FAIL: 
+            return {
+                ...state,
+                fdSummary: action.payload
+            }
+        case DEPOSITE.ON_FD_LOAN_LOAD:
+            return {
+                ...state,
+                fdLoans: null,
+            }
+        case DEPOSITE.ON_FD_LOAN_SUCCESS: 
+            return {
+                ...state,
+                fdLoans: action.payload
+            }
+        case DEPOSITE.ON_FD_LOAN_FAIL: 
+            return {
+                ...state,
+                fdLoans: action.payload
             }
         default: 
             return {
