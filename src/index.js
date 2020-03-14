@@ -11,6 +11,8 @@ import { NAVIGATION } from './navigation';
 import {DepositeList} from './modules/app/deposite';
 import Profile from './modules/app/profile';
 import fdDetails from './modules/app/deposite/fd-details';
+import MyLoans from './modules/app/my-loans';
+import serviceRequest from './modules/app/service-request';
 const Stack = createStackNavigator();
 class Index extends React.Component {
     state = {
@@ -66,6 +68,12 @@ class Index extends React.Component {
                             <Stack.Screen
                                 name={NAVIGATION.FD_DETAILS}
                                 component={fdDetails} />
+                            <Stack.Screen
+                                name={NAVIGATION.MY_LOANS}
+                                component={MyLoans} />
+                            <Stack.Screen
+                                name={NAVIGATION.SERVICE_REQUEST}
+                                component={serviceRequest} />
                         </>
                     )}
                 </Stack.Navigator>

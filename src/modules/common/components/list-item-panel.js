@@ -9,12 +9,13 @@ const ListItemPanel = ({
     itemWidth,
     noHoverEffect,
     content,
+    style,
 }) => {
     const listItemDRowOverrideStyle = itemWidth ? {width: itemWidth} : {};
     return (
         <View style={styles.listItemContainer}>
             <TouchableOpacity activeOpacity={noHoverEffect ? 1 : 0.9}>
-                <View style={styles.listItem}>
+                <View style={[styles.listItem, style ? style : {}]}>
                     <View style={styles.listItemTop}>
                         <Text style={styles.listItemTitle}>{panelTitleLabel}</Text>
                         {panelTitleValue && <Text style={styles.listItemSubTitle}>{panelTitleValue}</Text>}

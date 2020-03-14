@@ -60,3 +60,32 @@ export const fetchCustomerNominees = () => {
         });
     }
 }
+
+export const fetchRequestStatus = () => {
+    return (dispatch) => {
+        dispatch({
+            type: COMMON.ON_REQUEST_STATUS_LOAD,
+        });
+
+        return apiServices.fetchRequestStatus().then(res => {
+            const {data} = res;
+            if(data.responseCode === '200') {
+                dispatch({
+                    type: COMMON.ON_REQUEST_STATUS_SUCCESS,
+                    payload: data.response,
+                });
+            } else {
+                dispatch({
+                    type: COMMON.ON_REQUEST_STATUS_SUCCESS,
+                    payload: data.response,
+                });
+            }
+            
+        }).catch(err => {
+            dispatch({
+                type: COMMON.ON_REQUEST_STATUS_FAIL,
+                payload: 'Error in Server',
+            });
+        });
+    }
+}

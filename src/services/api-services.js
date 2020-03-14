@@ -41,5 +41,22 @@ class APIService {
     fetchFdLoans() {
         return axios.post(HOST + 'getFdLoans', {customerId: this.customerId}, this.getConfig());
     }
+    depositeRenewFD(depositNumber, withDrawalAmt, newDepositAmt, depositTenure, depositPayFrequency, prodId) {
+        const data = {
+            customerId: this.customerId,
+            purpose: 'CLOSED',
+            depositNumber,
+            withDrawalAmt,
+            newDepositAmt,
+            depositTenure,
+            depositPayFrequency,
+            prodId,
+        }
+        console.log(data, this.customerId);
+        return axios.post(HOST + 'depositRenewFd', data, this.getConfig());
+    }
+    fetchRequestStatus() {
+        return axios.post(HOST + 'requestStatus', {customerId: this.customerId}, this.getConfig());
+    }
 }
 export default new APIService();

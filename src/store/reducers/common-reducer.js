@@ -5,6 +5,7 @@ const {COMMON} = TYPES;
 const initialState = {
     userDetails: undefined,
     customerNominee: null,
+    requestStatus: null,
 };
 
 const commonReducer = (state = initialState, action) => {
@@ -38,6 +39,21 @@ const commonReducer = (state = initialState, action) => {
             return {
                 ...state,
                 customerNominee: action.payload
+            }
+        case COMMON.ON_REQUEST_STATUS_LOAD:
+            return {
+                ...state,
+                requestStatus: null,
+            }
+        case COMMON.ON_REQUEST_STATUS_SUCCESS: 
+            return {
+                ...state,
+                requestStatus: action.payload
+            }
+        case COMMON.ON_REQUEST_STATUS_FAIL: 
+            return {
+                ...state,
+                requestStatus: action.payload
             }
         default: 
             return {

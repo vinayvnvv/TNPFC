@@ -15,6 +15,7 @@ import Closure from './closure';
 import { fetchCustomerNominees } from '../../../store/actions/common-actions';
 import { fetchFDSummary, fetchFdLoans } from '../../../store/actions/deposite-actions';
 import { COMMON_STYLES } from '../../common/styles';
+import apiServices from '../../../services/api-services';
 const TabBar = ({
     tabs,
     goToPage,
@@ -47,6 +48,7 @@ const TabBar = ({
 class FDDetails extends React.Component {
     state = {
         pageInit: false,
+        renewFDScreenStatus: null,
     }
     componentDidMount() {
         this.initPageData();
@@ -72,8 +74,32 @@ class FDDetails extends React.Component {
         const {navigation} = this.props;
         navigation.goBack();
     }
+
+    onRenewFD = () => {
+        const {fdSummary} = this.props;
+        const depositNumber = fdSummary && fdSummary[0] && fdSummary[0].accountNumber;
+        this.setState({
+            renewFDScreenStatus: {type: 'renew', status: 'loading'},
+        });
+        apiServices.depositeRenewFD(depositNumber, '2233', '31232', '24', 'monthly', '202').then(res => {
+            console.log('res-->', res);
+            const {data} = res;
+            if(data.responseCode === '200') {
+                this.setState({renewFDScreenStatus: {type: 'renew', status: 'success', data: data.response}})
+            } else {
+                this.setState({
+                    renewFDScreenStatus: {type: 'renew', status: 'failed'}
+                });
+            }
+        }).catch(err => {
+            console.log('err-->', err);
+            this.setState({
+                renewFDScreenStatus: {type: 'renew', status: 'failed'}
+            });
+        });
+    }
     render() {
-        const {pageInit} = this.state;
+        const {pageInit, renewFDScreenStatus} = this.state;
         const {fdSummary, customerNominee, userDetails} = this.props;
         return (
             pageInit ? (
@@ -104,7 +130,10 @@ class FDDetails extends React.Component {
                                 <Certificate />
                             </ScrollView>
                             <ScrollView heading="Re-new FD">
-                                <RenewFD fdSummary={fdSummary}/>
+                                <RenewFD 
+                                    onRenewFD={this.onRenewFD}
+                                    status={renewFDScreenStatus} 
+                                    fdSummary={fdSummary}/>
                             </ScrollView>
                             <ScrollView heading="Loans">
                                 <Loans fdSummary={fdSummary}/>
