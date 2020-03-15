@@ -30,6 +30,7 @@ class Profile extends React.Component {
                 state,
                 city,
                 pincode,
+                profilePic,
             } = {},
         } = this.props;
         return (
@@ -49,7 +50,7 @@ class Profile extends React.Component {
                     <View style={styles.pageContainer}>
                         <View style={styles.headSection}>
                             <View style={styles.headSectionAvtr}>
-                                <Image style={styles.headSectionAvtrImage} source={icons.UserIcon} />
+                                <Image style={styles.headSectionAvtrImage} source={profilePic ? {uri: profilePic} : icons.UserIcon} />
                             </View>
                             <View style={styles.headSectionDetails}>
                                 <Text style={styles.headSectionName}>{customerName}</Text>

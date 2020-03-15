@@ -66,7 +66,7 @@ class MyLoans extends React.Component {
                         </Body>
                         <Right />
                     </Header>
-                    <SafeAreaView style={styles.container}>
+                    <Container style={styles.container}>
                         {fdLoans && fdLoans.length !== undefined  && fdLoans.length > 0 && (
                             <FlatList
                                 data={fdLoans}
@@ -79,7 +79,7 @@ class MyLoans extends React.Component {
                                 keyExtractor={item => item.loanAccountNumber}
                             />
                         )} 
-                    </SafeAreaView>
+                    </Container>
                 </Container>
                 ) : (
                     <Container>

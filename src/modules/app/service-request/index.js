@@ -61,7 +61,7 @@ class ServiceRequest extends React.Component {
                         </Body>
                         <Right />
                     </Header>
-                    <SafeAreaView style={styles.container}>
+                    <Container style={styles.container}>
                         {requestStatus && requestStatus.length !== undefined  && requestStatus.length > 0 && (
                             <FlatList
                                 data={requestStatus}
@@ -74,7 +74,7 @@ class ServiceRequest extends React.Component {
                                 keyExtractor={item => item.acknowledgementId}
                             />
                         )} 
-                    </SafeAreaView>
+                    </Container>
                 </Container>
                 ) : (
                     <Container>
