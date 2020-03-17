@@ -14,7 +14,7 @@ const {THEME} = CONFIG.APP;
 const resendTime = 12000;
 let timer = resendTime / 1000;
 
-const debugMode = true;
+const debugMode = false;
 
 class Login extends React.Component {
     state= {
@@ -78,6 +78,10 @@ class Login extends React.Component {
                         canReSendOtp: false,
                         verifying: false,
                     }, () => {
+                        setTimeout(()=>{
+                            this.setState({otpTextFieldValue: data.response.otp + ''})
+                        }, 1300);
+                        
                         if(debugMode) {
                             Toast.show({
                                 text: 'OTP is ' + data.response.otp,
@@ -177,12 +181,12 @@ class Login extends React.Component {
         return(
             <Container style={{backgroundColor: '#fff'}}>
                 <StatusBar backgroundColor={THEME.PRIMARY}/>
-                <Header noLeft>
+                {/* <Header noLeft>
                     <Left />
                 <Body>
                     <Title>{'Sign In / Sign Up'}</Title>
                 </Body>
-                </Header>
+                </Header> */}
                 <ScrollView>
                     <Content>
                         <View style={styles.headerContainerOuter}>
@@ -200,10 +204,11 @@ class Login extends React.Component {
                         <View style={styles.containerOuter}>
                             <View style={styles.container}>
                                 <Text style={styles.title}>Login</Text>
+                                <Text style={styles.subtitle}>For existing Users</Text>
                                 <View style={styles.formRow}>
                                     {/* <Text style={styles.formRowLabel} >PAN / Aadhar Number</Text> */}
                                     <Item floatingLabel>
-                                        <Label>PAN / Aadhar Number</Label>
+                                        <Label>PAN / Aaadhar Number</Label>
                                         <Input 
                                             value={panNumber} 
                                             onChangeText={(text) => this.onFieldChange('panNumber', text)} />
@@ -257,7 +262,7 @@ class Login extends React.Component {
                                             <Spinner />
                                         ) : (
                                             <Button success block onPress={this.sendOTP}>
-                                                <Text style={styles.loginBtn}>Get Otp</Text>
+                                                <Text style={styles.loginBtn}>Get OTP</Text>
                                             </Button>
                                         )
                                     )}
@@ -280,7 +285,7 @@ const styles = StyleSheet.create({
         flexDirection: 'column',
         // justifyContent: "center",
         alignItems: "center",
-        paddingTop: 31,
+        paddingTop: 71,
         paddingBottom: 91,
     },
     headerContainerTitle: {
@@ -331,8 +336,13 @@ const styles = StyleSheet.create({
     title: {
         fontSize: 18,
         color: THEME.PRIMARY,
-        marginBottom: 41,
         // fontWeight: 'bold',
+        marginBottom: 11,
+    },
+    subtitle: {
+        fontSize: 14,
+        color: '#000000',
+        marginBottom: 41,
     },
     formRow: {
         flexDirection: 'column',
@@ -362,7 +372,7 @@ const styles = StyleSheet.create({
         marginVertical: 21,
     },
     loginBtn: {
-        textTransform: 'capitalize',
+        // textTransform: 'capitalize',
         fontWeight: '500',
         letterSpacing: 0.7,
         fontSize: 18
