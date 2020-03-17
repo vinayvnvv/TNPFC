@@ -208,7 +208,7 @@ class Login extends React.Component {
                                 <View style={styles.formRow}>
                                     {/* <Text style={styles.formRowLabel} >PAN / Aadhar Number</Text> */}
                                     <Item floatingLabel>
-                                        <Label>PAN / Aaadhar Number</Label>
+                                        <Label>PAN / Aadhaar Number</Label>
                                         <Input 
                                             value={panNumber} 
                                             onChangeText={(text) => this.onFieldChange('panNumber', text)} />
@@ -315,7 +315,7 @@ const styles = StyleSheet.create({
         borderRadius: 90,
         width: '100%',
     },
-    containerOuter: {
+    containerOuter: {   
         paddingVertical: 21,
         paddingHorizontal: 32,
         position: 'relative',

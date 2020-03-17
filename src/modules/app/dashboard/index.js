@@ -20,12 +20,12 @@ const lists = [
     {name: 'Fixed Deposit', navigation: NAVIGATION.DEPOSITE_LIST, icon: icons.FDIcon},
     {name: 'Loan Request', icon: icons.LoanReqIcon},
     {name: 'My Loans', navigation: NAVIGATION.MY_LOANS, icon: icons.MyLoansIcon},
-    {name: 'FD Calculator', icon: icons.FDCalcIcon},
+    // {name: 'FD Calculator', icon: icons.FDCalcIcon},
     {name: 'Certificate', icon: icons.CertificateIcon},
-    {name: 'Activity', icon: icons.ActivityIcon},
-    {name: 'Application Status', icon: icons.AppStatusIcon},
+    // {name: 'Activity', icon: icons.ActivityIcon},
+    // {name: 'Application Status', icon: icons.AppStatusIcon},
     {name: 'Service Request', navigation: NAVIGATION.SERVICE_REQUEST, icon: icons.ServiceReqIcon},
-    {name: 'Reports', icon: icons.ReportsIcon},
+    {name: 'Tax Documents', icon: icons.ReportsIcon},
 ];
 
 const menus = [
@@ -57,9 +57,9 @@ class DashBoard extends React.Component {
                     <Title>{CONFIG.APP.TITLE}</Title>
                 </Body>
                     <Right>
-                        <Button transparent>
+                        {/* <Button transparent>
                             <Icon name='notifications-outline' />
-                        </Button>
+                        </Button> */}
                         <Button transparent>
                             <Menu>
                                 <MenuTrigger>
