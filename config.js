@@ -6,6 +6,8 @@ export const CONFIG = {
             PRIMARY_INVERT: '#ffffff',
             LAYOUT_PADDING: 21,
             SUCCESS: '#36b28a',
+            ORANGE: '#eb9d3f',
+            DANGER: '#ce3c3e',
         }
     },
     API: {

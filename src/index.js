@@ -13,6 +13,7 @@ import Profile from './modules/app/profile';
 import fdDetails from './modules/app/deposite/fd-details';
 import MyLoans from './modules/app/my-loans';
 import serviceRequest from './modules/app/service-request';
+import { View, Container, Content, Left, Right, Header, Body, Button, Icon, Text } from 'native-base';
 const Stack = createStackNavigator();
 class Index extends React.Component {
     state = {
@@ -74,6 +75,9 @@ class Index extends React.Component {
                             <Stack.Screen
                                 name={NAVIGATION.SERVICE_REQUEST}
                                 component={serviceRequest} />
+                            <Stack.Screen
+                                name={NAVIGATION.COMMING_SOON}
+                                component={CommingSoon} />
                         </>
                     )}
                 </Stack.Navigator>
@@ -90,3 +94,28 @@ export default connect(
     mapStateToProps,
     {setAuth, fetchCustomerDetails}
 )(Index);
+
+
+
+const CommingSoon = ({
+    navigation,
+}) => {
+    return (
+        <Container>
+            <Header>
+                <Left>
+                    <Button transparent onPress={() => navigation.goBack()}>
+                        <Icon name='arrow-back' />
+                    </Button>
+                </Left>
+                <Body/>
+                <Right />
+            </Header>
+            <Content>
+                <View style={{height: 400, flexDirection: 'column', justifyContent: 'center', alignItems: 'center'}}>
+                    <Text style={{fontSize: 18, fontWeight: '700'}}>Comming Soon...</Text>
+                </View>
+            </Content>
+        </Container>
+    )
+}

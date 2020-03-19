@@ -17,6 +17,7 @@ const FDSummary = ({
         maturityDate,
         interestRatePercent,
         openDate,
+        accountStatus,
     } = fdSummary.length > 0 ? fdSummary[0] : {};
     const graphPercet = (100 * interestAmount) / depositAmount;
     const graphInterst = graphPercet / 100;
@@ -29,13 +30,35 @@ const FDSummary = ({
         return (num * 100).toFixed(2) + '%';
     }
     const chartAsHTML = utils.getPieChartAsHTML(slices);
+    const getSummaryStatus = type => {
+        let color = '';
+        let text = '';
+        if(accountStatus === 'NEW') {
+            text = 'Active';
+            color = THEME.SUCCESS;
+        }
+        if(accountStatus === 'MATURED') {
+            text = 'Matured';
+            color = THEME.ORANGE;
+        }
+        if(accountStatus === 'CLOSED') {
+            text = 'Closed';
+            color = THEME.DANGER;
+        }
+        if(type === 'text') {
+            return text;
+        }
+        if(type === 'color') {
+            return {backgroundColor: color};
+        }
+    }
     return (
         <View >
             <View style={styles.container}>
                 <View style={styles.activeSection}>
                     <View style={styles.actionC}>
-                        <View style={styles.activeI} />
-                        <Text style={styles.activeT}>Active</Text>
+                        <View style={[styles.activeI, getSummaryStatus('color')]} />
+                        <Text style={styles.activeT}>{getSummaryStatus('text')}</Text>
                     </View>
                     {/* <Button small warning>
                         <Text>Download</Text>

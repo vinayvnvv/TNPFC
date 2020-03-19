@@ -52,21 +52,31 @@ const Item = ({
         </TouchableOpacity>
     </View>
 );
-const ListHeader = ({headerList}) => (
+const getActiveColor = status => {
+    if(status) return {color: THEME.PRIMARY, fontWeight: '900'};
+    else return {};
+}
+const ListHeader = ({headerList, onPress, selectedIndex}) => (
     <View>
         <View style={styles.headerContainer}>
             {headerList.map((item, index) =>
-                <View key={index + '-header-list'} style={styles.headerListItemContainer}>
-                    <View style={styles.headerListItem}>
-                        <View style={styles.headerListItemIcon}>
-                            <Image style={styles.headerListItemImage} source={item.icon}/>
-                        </View>
-                        <View style={styles.headerListItemDetails}>
-                            <Text style={styles.headerListItemLabel}>{item.title}</Text>
-                            <Text style={styles.headerListItemValue}>{item.count}</Text>
-                        </View>
-                    </View>
-                </View>
+                // <TouchableOpacity>
+                    <TouchableOpacity 
+                        onPress={() => onPress(index)}
+                        key={index + '-header-list'} 
+                        activeOpacity={0.7}
+                        style={[styles.headerListItemContainer]}>
+                            <View style={[styles.headerListItem]}>
+                                <View style={styles.headerListItemIcon}>
+                                    <Image style={styles.headerListItemImage} source={item.icon}/>
+                                </View>
+                                <View style={styles.headerListItemDetails}>
+                                    <Text style={[styles.headerListItemLabel, getActiveColor(index === selectedIndex)]}>{item.title}</Text>
+                                    <Text style={styles.headerListItemValue}>{item.count}</Text>
+                                </View>
+                            </View>
+                    </TouchableOpacity>
+                // </TouchableOpacity>
             )}
         </View>
         <View style={styles.headerOverlap} />
@@ -75,6 +85,9 @@ const ListHeader = ({headerList}) => (
 )
 
 export class DepositeList extends React.Component {
+    state = {
+        selectedFilterIndex: 0,
+    };
     componentDidMount() {
         const {fetchAllDeposites, depositeList} = this.props;
         if(!depositeList) fetchAllDeposites();
@@ -104,9 +117,23 @@ export class DepositeList extends React.Component {
             {title: 'Active FD', count: active, icon: icons.ActiveFDIcon},
         ]
     }
+    onHeaderItemPress = index => {
+        this.setState({selectedFilterIndex: index});
+    }
+    filterDepositeList = list => {
+        const {selectedFilterIndex} = this.state;
+        let filterLabel = 'ALL';
+        if(selectedFilterIndex === 1) filterLabel = 'NEW';
+        if(selectedFilterIndex === 2) filterLabel = 'MATURED';
+        if(selectedFilterIndex === 3) filterLabel = 'CLOSED';
+        if(filterLabel === 'ALL') return list;
+        return list.filter(l=>l.accountStatus === filterLabel);
+    }
     render() {
         const {depositeList} = this.props;
+        const {selectedFilterIndex} = this.state;
         const headerList = this.getHeaderList(depositeList);
+        const depositeFilterList = this.filterDepositeList(depositeList);
         return (
             <Container>
                 <Header>
@@ -121,10 +148,15 @@ export class DepositeList extends React.Component {
                     <Right />
                 </Header>
                 <SafeAreaView style={styles.container}>
-                    {depositeList && depositeList.length !== undefined  && depositeList.length > 0 && (
+                    {depositeFilterList && depositeFilterList.length !== undefined  && depositeFilterList.length > 0 && (
                         <FlatList
-                            data={depositeList}
-                            ListHeaderComponent={<ListHeader headerList={headerList}/>}
+                            data={depositeFilterList}
+                            ListHeaderComponent={
+                                <ListHeader 
+                                    onPress={this.onHeaderItemPress} 
+                                    selectedIndex={selectedFilterIndex}
+                                    headerList={headerList}/>
+                            }
                             renderItem={({ item }) => (
                             <Item
                                 data={item}
