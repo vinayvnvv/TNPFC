@@ -14,7 +14,6 @@ const FDSummary = ({
         interestAmount,
         depositAmount,
         productDesc,
-        interestPaid,
         maturityDate,
         interestRatePercent,
         openDate,
@@ -23,9 +22,12 @@ const FDSummary = ({
     const graphInterst = graphPercet / 100;
     const graphDeposite = 1 - graphInterst;
     const slices = [
-        { percent: graphInterst, color: THEME.PRIMARY },
-        { percent: graphDeposite, color: THEME.SUCCESS },
+        { percent: graphInterst, color: THEME.SUCCESS },
+        { percent: graphDeposite, color: THEME.PRIMARY },
     ];
+    const getPerceVal = num => {
+        return (num * 100).toFixed(2) + '%';
+    }
     const chartAsHTML = utils.getPieChartAsHTML(slices);
     return (
         <View >
@@ -35,9 +37,9 @@ const FDSummary = ({
                         <View style={styles.activeI} />
                         <Text style={styles.activeT}>Active</Text>
                     </View>
-                    <Button small warning>
+                    {/* <Button small warning>
                         <Text>Download</Text>
-                    </Button>
+                    </Button> */}
                 </View>
                 <View style={styles.chartSection}>
                     <Text style={styles.chartSectionTitle}>Deposite & Interest Breakup</Text>
@@ -52,17 +54,17 @@ const FDSummary = ({
                     <View style={styles.chartLegenC}>
                         <View style={styles.chartLegenR}>
                             <View style={styles.chartLegenI}/>
-                            <Text style={styles.chartLegenT}>Interest Amount</Text>
+                            <Text style={styles.chartLegenT}>Deposit Amount({getPerceVal(graphDeposite)})</Text>
                         </View>
                         <View style={styles.chartLegenR}>
                             <View style={[styles.chartLegenI, styles.chartLegenISuccess]}/>
-                            <Text style={styles.chartLegenT}>Deposited Interest</Text>
+                            <Text style={styles.chartLegenT}>Interest Amount ({getPerceVal(graphInterst)})</Text>
                         </View>
                     </View>
                     <View style={styles.chartTC}>
                         <View style={styles.chartTI}>
                             <View style={styles.chartTL}>
-                                <Text style={styles.chartTLText}>Deposited Interest</Text>
+                                <Text style={styles.chartTLText}>Deposit Amount</Text>
                             </View>
                             <View style={styles.chartTV}>
                                 <Text style={styles.chartTVText}>{depositAmount}</Text>
@@ -70,10 +72,10 @@ const FDSummary = ({
                         </View>
                         <View style={[styles.chartTI, styles.chartTISuccess]}>
                             <View style={[styles.chartTL, styles.chartTLSuccess]}>
-                                <Text style={styles.chartTLText}>Interest Earned</Text>
+                                <Text style={styles.chartTLText}>Interest Amount</Text>
                             </View>
                             <View style={styles.chartTV}>
-                                <Text style={styles.chartTVText}>{interestPaid}</Text>
+                                <Text style={styles.chartTVText}>{interestAmount}</Text>
                             </View>
                         </View>
                     </View>
@@ -89,12 +91,12 @@ const FDSummary = ({
                         }
                         panelTitleValue={productDesc}
                         noHoverEffect={true}
-                        panelTitleLabel={'Schema Name'}/>
+                        panelTitleLabel={'Scheme Name'}/>
                 </View>
-                <View style={styles.timeLineC}>
+                {/* <View style={styles.timeLineC}>
                     <Text style={styles.timeLineT}>Timeline</Text>
                     <Timeline />
-                </View>
+                </View> */}
             </View>
         </View>
     );

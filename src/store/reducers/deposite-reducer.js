@@ -6,6 +6,7 @@ const initialState = {
     depositeList: null,
     fdSummary: null,
     fdLoans: null,
+    applyLoan: null,
 };
 
 const depositeReducer = (state = initialState, action) => {

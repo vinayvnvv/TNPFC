@@ -26,6 +26,7 @@ const lists = [
     // {name: 'Application Status', icon: icons.AppStatusIcon},
     {name: 'Service Request', navigation: NAVIGATION.SERVICE_REQUEST, icon: icons.ServiceReqIcon},
     {name: 'Tax Documents', icon: icons.ReportsIcon},
+    {name: 'Profile', icon: icons.ReportsIcon, navigation: NAVIGATION.PROFILE},
 ];
 
 const menus = [
@@ -57,10 +58,10 @@ class DashBoard extends React.Component {
                     <Title>{CONFIG.APP.TITLE}</Title>
                 </Body>
                     <Right>
+                        <Button transparent onPress={() => this.onDropDownSelect(menus[1].title)}>
+                            <Icon name='power' />
+                        </Button>
                         {/* <Button transparent>
-                            <Icon name='notifications-outline' />
-                        </Button> */}
-                        <Button transparent>
                             <Menu>
                                 <MenuTrigger>
                                     <Icon style={{color: '#ffffff'}} name='settings' />
@@ -74,7 +75,7 @@ class DashBoard extends React.Component {
                                     )}
                                 </MenuOptions>
                             </Menu>
-                        </Button>
+                        </Button> */}
                     </Right>
                 </Header>
                 <ScrollView>

@@ -55,6 +55,23 @@ class APIService {
         console.log(data, this.customerId);
         return axios.post(HOST + 'depositRenewFd', data, this.getConfig());
     }
+    applyLoan(depositNumber, loanAmt) {
+        const data = {
+            customerId: this.customerId,
+            purpose: 'LOAN_ON_DEPOSIT',
+            depositNumber,
+            loanAmt,
+        }
+        return axios.post(HOST + 'loanAgainstDeposit', data, this.getConfig());
+    }
+    depositClosure(depositNumber) {
+        const data = {
+            customerId: this.customerId,
+            purpose: 'CLOSED',
+            depositNumber,
+        }
+        return axios.post(HOST + 'depositClosure', data, this.getConfig());
+    }
     fetchRequestStatus() {
         return axios.post(HOST + 'requestStatus', {customerId: this.customerId}, this.getConfig());
     }

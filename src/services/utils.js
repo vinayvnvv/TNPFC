@@ -55,7 +55,7 @@ class Utils {
                 `L 0 0`, // Line
             ].join(' ');
             p = p + `<path d="${pathData}" fill="${slice.color}"></path>`;
-            p = p + `<text x="${xTextPos}" y="${yTextPos}" fill="#fff" style='font-size: 0.2'>${parseInt(slice.percent * 100)}%</text>`
+            // p = p + `<text x="${xTextPos}" y="${yTextPos}" fill="#fff" style='font-size: 0.2'>${parseInt(slice.percent * 100)}%</text>`
         });
         return `<html>
                     <head>

@@ -3,13 +3,27 @@ import {View, StyleSheet} from 'react-native';
 import { THEME } from '../../../../config';
 import ListItemPanel from '../../common/components/list-item-panel';
 const Nominee = ({
-    customerNominee
+    fdSummary
 }) => {
     const {
         nomineeName,
-        relationship,
-        customerId
-    } = customerNominee.length > 0 ? customerNominee[0] : {};
+        nomineeRelationship,
+        // customerId,
+        guardianRelationship,
+        guardianName,
+        isNomineeMajor,
+        nomineeDob,
+        nomineeGuardianName,
+        nomineeGuardianRelationship,
+    } = fdSummary && fdSummary.length > 0 ? fdSummary[0] : {};
+    const lists = [];
+    lists.push(['Related Person Type', nomineeRelationship, '100%']);
+    lists.push(['Nominee Name', nomineeName || '--']);
+    if(isNomineeMajor === 'N') {
+        lists.push(['Nominee DOB', nomineeDob]);
+        lists.push(['Guardian Name', nomineeGuardianName]);
+        lists.push(['Guardian Relationship', nomineeGuardianRelationship])
+    }
     return (
         <View>
             <View style={styles.container}>
@@ -17,12 +31,7 @@ const Nominee = ({
                     <ListItemPanel 
                         itemWidth={'50%'}
                         noHoverEffect={true}
-                        lists={[
-                            ['Related Person Type', relationship, '100%'],
-                            ['Nominee Name', nomineeName],
-                            ['Gender', '--'],
-                            ['Proof ID', customerId]
-                        ]}
+                        lists={lists}
                         panelTitleLabel={'Nominee'}/>
                 </View>
             </View>

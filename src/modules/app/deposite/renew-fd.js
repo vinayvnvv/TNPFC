@@ -15,11 +15,13 @@ const RenewFD = ({
         interestAmount,
         depositAmount,
         productDesc,
-        interestPaid,
+        intpayFrequency,
         maturityDate,
         interestRatePercent,
         maturityAmount,
         openDate,
+        tenure,
+        isDepositRenewable,
     } = fdSummary.length > 0 ? fdSummary[0] : {};
     const successData = status && status.data;
     return (
@@ -37,31 +39,28 @@ const RenewFD = ({
                             lists={[
                                 ['Start Date', utils.getAppCommonDateFormat(openDate)],
                                 ['Maturity Date', utils.getAppCommonDateFormat(maturityDate)],
-                                ['Interest Payment', interestPaid],
-                                ['Deposited Amount', depositAmount],
+                                ['Interest Payment', intpayFrequency],
+                                ['Deposit Amount', depositAmount],
                                 ['Maturity Amount', maturityAmount],
-                                ['Interest Rate', interestRatePercent],
-                                ['Duration', '5 years']
+                                ['Rate of Interest', interestRatePercent],
+                                ['Duration (Months)', tenure]
                             ]}
-                            panelTitleLabel={'Schema Name'}
-                            panelTitleValue={'RSIPN'}/>
+                            panelTitleLabel={'Scheme Name'}
+                            panelTitleValue={productDesc}/>
                     </View>
-                    <View style={styles.actions}>
-                        <View style={styles.actionBtnC}>
-                            <Button light style={styles.actionBtn} block>
-                                <Text style={styles.actionBtnText}>Late Re-new FD</Text>
-                            </Button>
+                    {isDepositRenewable !== 'TRUE' && (
+                        <View style={styles.actions}>
+                            <View style={styles.actionBtnC}>
+                                {status && status.type === 'renew' && status.status === 'loading' ? (
+                                    <Spinner />
+                                ) : (
+                                    <Button primary block onPress={onRenewFD}>
+                                        <Text style={styles.actionBtnText}>QUICK RENEW FD</Text>
+                                    </Button>
+                                )}
+                            </View>
                         </View>
-                        <View style={styles.actionBtnC}>
-                            {status && status.type === 'renew' && status.status === 'loading' ? (
-                                <Spinner />
-                            ) : (
-                                <Button primary block onPress={onRenewFD}>
-                                    <Text style={styles.actionBtnText}>Re-new FD</Text>
-                                </Button>
-                            )}
-                        </View>
-                    </View>
+                    )}
                 </View>
             )}
         </View>
@@ -84,7 +83,7 @@ const styles = StyleSheet.create({
         // justifyContent: 'center',
     },
     actionBtnC: {
-        width: '50%',
+        width: '100%',
         paddingHorizontal: THEME.LAYOUT_PADDING,
     },
     actionBtn: {

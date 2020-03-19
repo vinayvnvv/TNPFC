@@ -12,7 +12,7 @@ import Certificate from './certificate';
 import RenewFD from './renew-fd';
 import Loans from './loans';
 import Closure from './closure';
-import { fetchCustomerNominees } from '../../../store/actions/common-actions';
+// import { fetchCustomerNominees } from '../../../store/actions/common-actions';
 import { fetchFDSummary, fetchFdLoans } from '../../../store/actions/deposite-actions';
 import { COMMON_STYLES } from '../../common/styles';
 import apiServices from '../../../services/api-services';
@@ -49,6 +49,7 @@ class FDDetails extends React.Component {
     state = {
         pageInit: false,
         renewFDScreenStatus: null,
+        applyLoanStatus: null,
     }
     componentDidMount() {
         this.initPageData();
@@ -56,17 +57,17 @@ class FDDetails extends React.Component {
 
     initPageData = async () => {
         const {
-            fetchCustomerNominees,
+            // fetchCustomerNominees,
             fetchFDSummary,
             fetchFdLoans,
             fdLoans,
-            customerNominee,
+            // customerNominee,
             // fdSummary,
             route: {params: {selectedDeposite = {}} = {}}
         } = this.props;
         await fetchFDSummary(selectedDeposite.accountNumber);
         if(!fdLoans) await fetchFdLoans();
-        if(!customerNominee) await fetchCustomerNominees();
+        // if(!customerNominee) await fetchCustomerNominees();
         this.setState({pageInit: true});
     }
 
@@ -98,9 +99,59 @@ class FDDetails extends React.Component {
             });
         });
     }
+
+    applyLoan = loanAmt => {
+        const {fdSummary} = this.props;
+        const depositNumber = fdSummary && fdSummary[0] && fdSummary[0].accountNumber;
+        this.setState({
+            applyLoanStatus: {type: 'applyLoan', status: 'loading'},
+        });
+        apiServices.applyLoan(depositNumber, loanAmt).then(res => {
+            console.log('res-->', res);
+            const {data} = res;
+            if(data.responseCode === '200') {
+                this.setState({applyLoanStatus: {type: 'applyLoan', status: 'success', data: data.response}})
+            } else {
+                this.setState({
+                    applyLoanStatus: {type: 'applyLoan', status: 'failed'}
+                });
+            }
+        }).catch(err => {
+            console.log('err-->', err);
+            this.setState({
+                applyLoanStatus: {type: 'applyLoan', status: 'failed'}
+            });
+        });
+    }
+
+    depositClosure = () => {
+        const {fdSummary} = this.props;
+        const depositNumber = fdSummary && fdSummary[0] && fdSummary[0].accountNumber;
+        this.setState({
+            depositClosureStatus: {type: 'depositClosure', status: 'loading'},
+        });
+        apiServices.depositClosure(depositNumber).then(res => {
+            console.log('res-->', res);
+            const {data} = res;
+            if(data.responseCode === '200') {
+                this.setState({depositClosureStatus: {type: 'depositClosure', status: 'success', data: data.response}})
+            } else {
+                this.setState({
+                    depositClosureStatus: {type: 'depositClosure', status: 'failed'}
+                });
+            }
+        }).catch(err => {
+            console.log('err-->', err);
+            this.setState({
+                depositClosureStatus: {type: 'depositClosure', status: 'failed'}
+            });
+        });
+    }
+
+
     render() {
-        const {pageInit, renewFDScreenStatus} = this.state;
-        const {fdSummary, customerNominee, userDetails} = this.props;
+        const {pageInit, renewFDScreenStatus, applyLoanStatus, depositClosureStatus} = this.state;
+        const {fdSummary, userDetails, fdLoans} = this.props;
         return (
             pageInit ? (
                 <Container>
@@ -121,10 +172,10 @@ class FDDetails extends React.Component {
                                 <FDSummary fdSummary={fdSummary}/>
                             </ScrollView>
                             <ScrollView heading={'Personal Info'}>
-                                <PersonalInfo userDetails={userDetails}/>
+                                <PersonalInfo fdSummary={fdSummary} userDetails={userDetails}/>
                             </ScrollView>
                             <ScrollView heading="Nominee">
-                                <Nominee customerNominee={customerNominee}/>
+                                <Nominee fdSummary={fdSummary}/>
                             </ScrollView>
                             <ScrollView heading="Certificate">
                                 <Certificate />
@@ -136,10 +187,17 @@ class FDDetails extends React.Component {
                                     fdSummary={fdSummary}/>
                             </ScrollView>
                             <ScrollView heading="Loans">
-                                <Loans fdSummary={fdSummary}/>
+                                <Loans 
+                                    fdSummary={fdSummary} 
+                                    fdLoans={fdLoans} 
+                                    status={applyLoanStatus}
+                                    applyLoan={this.applyLoan}/>
                             </ScrollView>
                             <ScrollView heading="Closure">
-                                <Closure fdSummary={fdSummary}/>
+                                <Closure 
+                                    status={depositClosureStatus}
+                                    depositClosure={this.depositClosure}
+                                    fdSummary={fdSummary}/>
                             </ScrollView>
                         </Tabs>
                     </Container>
@@ -193,14 +251,14 @@ const styles = StyleSheet.create({
 const mapStateToProps = state => ({
     fdSummary: state.depositeReducer.fdSummary,
     fdLoans: state.depositeReducer.fdLoans,
-    customerNominee: state.commonReducer.customerNominee,
+    // customerNominee: state.commonReducer.customerNominee,
     userDetails: state.commonReducer.userDetails,
 });
 
 export default connect(
     mapStateToProps,
     {   
-        fetchCustomerNominees,
+        // fetchCustomerNominees,
         fetchFDSummary,
         fetchFdLoans,
     },
