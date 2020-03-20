@@ -6,6 +6,7 @@ import { THEME } from '../../../../config';
 import { fetchAllDeposites } from '../../../store/actions/deposite-actions';
 import { COMMON_STYLES } from '../../common/styles';
 import { NAVIGATION } from '../../../navigation';
+import utils from '../../../services/utils';
 
 
 const Item = ({
@@ -13,16 +14,39 @@ const Item = ({
     data: {
         accountNumber,
         productDesc,
+        depositAmount,
+        openDate,
     } = {},
     onItemClick,
 }) => (
-    <TouchableOpacity 
-        style={styles.item} 
-        activeOpacity={0.7}
-        onPress={()=>onItemClick(data)}>
-            <Text style={styles.itemAcc}>{accountNumber}</Text>
-            <Text style={styles.productDesc}>{productDesc}</Text>
-    </TouchableOpacity>
+    <View 
+        style={styles.item} >
+            <View style={styles.left}>
+                <View style={styles.dtls}>
+                    <Text style={styles.dtlsLabel}>Scheme Name</Text>
+                    <Text style={styles.dtlsValue}>{productDesc}</Text>
+                </View>
+                <View style={styles.dtls}>
+                    <Text style={styles.dtlsLabel}>FD No.</Text>
+                    <Text style={styles.dtlsValue}>{accountNumber}</Text>
+                </View>
+                <View style={styles.dtls}>
+                    <Text style={styles.dtlsLabel}>Deposited Amount</Text>
+                    <Text style={styles.dtlsValue}>{depositAmount}</Text>
+                </View>
+                <View style={styles.dtls}>
+                    <Text style={styles.dtlsLabel}>Date</Text>
+                    <Text style={styles.dtlsValue}>{utils.getAppCommonDateFormat(openDate)}</Text>
+                </View>
+                
+            </View>
+            <View style={styles.right}>
+                <Button 
+                    onPress={()=>onItemClick(data)} 
+                    style={styles.btnOpen} 
+                    small><Text>Open</Text></Button>
+            </View>
+    </View>
 );
 
 class CertificateList extends React.Component {
@@ -66,11 +90,11 @@ class CertificateList extends React.Component {
                         {depositeList && depositeList.length > 0 && (
                             <FlatList
                                 data={depositeList}
-                                ListHeaderComponent={
-                                    <View style={styles.listHeader}>
-                                        <Text style={styles.listHeaderT}>Total ({depositeList && depositeList.length})</Text>
-                                    </View>
-                                }
+                                // ListHeaderComponent={
+                                //     <View style={styles.listHeader}>
+                                //         <Text style={styles.listHeaderT}>Total ({depositeList && depositeList.length})</Text>
+                                //     </View>
+                                // }
                                 renderItem={({ item }) => (
                                 <Item
                                     onItemClick={this.onItemClick}
@@ -96,25 +120,61 @@ class CertificateList extends React.Component {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        // padding: THEME.LAYOUT_PADDING,
+        padding: (THEME.LAYOUT_PADDING - 5),
+        paddingTop: 0
     },
     listHeader: {
         backgroundColor: '#e6e6e6',
         paddingVertical: 11,
         paddingHorizontal: THEME.LAYOUT_PADDING,
+        marginTop: (THEME.LAYOUT_PADDING * 2),
     },
     listHeaderT: {
         color: '#444',
         fontWeight: '700'
     },
     item: {
+        ...utils.getBoxShadow(2, '#000000'),
         paddingHorizontal: THEME.LAYOUT_PADDING,
-        flexDirection: 'row',
-        alignItems: 'flex-start',
+        flexDirection: 'column',
+        alignItems: 'center',
         paddingVertical: 11,
-        borderBottomWidth: 1,
-        borderColor: '#d9d9d988',
-        borderStyle: 'solid'
+        marginHorizontal: 5,
+        marginVertical: 11,
+        backgroundColor: '#ecf1f9',
+        borderRadius: 3,
+        // borderBottomWidth: 1,
+        // borderColor: '#d9d9d988',
+        // borderStyle: 'solid',
+    },
+    left: {
+        flexWrap: 'wrap',
+        flexDirection: 'row',
+        maxWidth: '100%'
+    },
+    right: {
+        marginTop: 9,
+        width: '100%',
+        flexDirection: 'row',
+        justifyContent: 'flex-end'
+    },
+    dtls: {
+        flexDirection: 'column',
+        marginVertical: 7,
+        paddingHorizontal: 2,
+        width: '50%'
+    },
+    dtlsLabel: {
+        color: THEME.PRIMARY,
+        fontWeight: 'bold',
+        fontSize: 14,
+    },
+    dtlsValue: {
+        color: '#666',
+        fontSize: 14,
+    },
+    btnOpen: {
+        paddingHorizontal: 3,
     },
     itemAcc: {
         width: '40%',
