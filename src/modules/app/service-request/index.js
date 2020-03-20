@@ -23,7 +23,7 @@ const Item = ({
         noHoverEffect
         lists={[
             ['Purpose', purpose],
-            ['Deposite No.', depositNumber],
+            ['Deposit No.', depositNumber],
         ]}
         panelTitleLabel={'Ticket ID'} />
 );

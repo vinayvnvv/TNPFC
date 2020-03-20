@@ -177,9 +177,9 @@ class FDDetails extends React.Component {
                             <ScrollView heading="Nominee">
                                 <Nominee fdSummary={fdSummary}/>
                             </ScrollView>
-                            <ScrollView heading="Certificate">
+                            {/* <ScrollView heading="Certificate">
                                 <Certificate />
-                            </ScrollView>
+                            </ScrollView> */}
                             <ScrollView heading="Re-new FD">
                                 <RenewFD 
                                     onRenewFD={this.onRenewFD}

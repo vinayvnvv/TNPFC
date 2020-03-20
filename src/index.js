@@ -14,6 +14,8 @@ import fdDetails from './modules/app/deposite/fd-details';
 import MyLoans from './modules/app/my-loans';
 import serviceRequest from './modules/app/service-request';
 import { View, Container, Content, Left, Right, Header, Body, Button, Icon, Text } from 'native-base';
+import CertificateList from './modules/app/certificate-list';
+import ViewCertificate from './modules/app/certificate-list/view-certificate';
 const Stack = createStackNavigator();
 class Index extends React.Component {
     state = {
@@ -78,6 +80,12 @@ class Index extends React.Component {
                             <Stack.Screen
                                 name={NAVIGATION.COMMING_SOON}
                                 component={CommingSoon} />
+                            <Stack.Screen
+                                name={NAVIGATION.CERTIFICATE_LIST}
+                                component={CertificateList} />
+                            <Stack.Screen
+                                name={NAVIGATION.VIEW_CERTIFICATE}
+                                component={ViewCertificate} />
                         </>
                     )}
                 </Stack.Navigator>

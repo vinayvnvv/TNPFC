@@ -65,7 +65,7 @@ const FDSummary = ({
                     </Button> */}
                 </View>
                 <View style={styles.chartSection}>
-                    <Text style={styles.chartSectionTitle}>Deposite & Interest Breakup</Text>
+                    <Text style={styles.chartSectionTitle}>Deposit & Interest Breakup</Text>
                     <View style={styles.chartContainer}>
                         {Platform.OS === 'web' ? 
                             <div style={{
