@@ -16,6 +16,8 @@ import serviceRequest from './modules/app/service-request';
 import { View, Container, Content, Left, Right, Header, Body, Button, Icon, Text } from 'native-base';
 import CertificateList from './modules/app/certificate-list';
 import ViewCertificate from './modules/app/certificate-list/view-certificate';
+import fdCalc from './modules/app/fd-calc';
+import PaymentView from './modules/app/fd-calc/PaymentView';
 const Stack = createStackNavigator();
 class Index extends React.Component {
     state = {
@@ -86,6 +88,15 @@ class Index extends React.Component {
                             <Stack.Screen
                                 name={NAVIGATION.VIEW_CERTIFICATE}
                                 component={ViewCertificate} />
+                            <Stack.Screen
+                                name={NAVIGATION.FD_CALCULATER}
+                                component={fdCalc} />
+                            <Stack.Screen
+                                options={{
+                                    headerLeft: null,
+                                }}
+                                name={NAVIGATION.PAYMENT_PAGE}
+                                component={PaymentView} />
                         </>
                     )}
                 </Stack.Navigator>

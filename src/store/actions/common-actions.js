@@ -89,3 +89,32 @@ export const fetchRequestStatus = () => {
         });
     }
 }
+
+export const fetchProductDetails = () => {
+    return (dispatch) => {
+        dispatch({
+            type: COMMON.ON_PRODUCT_DETAILS_LOAD,
+        });
+
+        return apiServices.fetchProductDetails().then(res => {
+            const {data} = res;
+            if(data.responseCode === '200') {
+                dispatch({
+                    type: COMMON.ON_PRODUCT_DETAILS_SUCCESS,
+                    payload: data.response,
+                });
+            } else {
+                dispatch({
+                    type: COMMON.ON_PRODUCT_DETAILS_SUCCESS,
+                    payload: data.response,
+                });
+            }
+            
+        }).catch(err => {
+            dispatch({
+                type: COMMON.ON_PRODUCT_DETAILS_FAIL,
+                payload: 'Error in Server',
+            });
+        });
+    }
+}

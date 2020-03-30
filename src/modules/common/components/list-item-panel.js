@@ -10,12 +10,19 @@ const ListItemPanel = ({
     noHoverEffect,
     content,
     style,
+    borderRadius = 0,
 }) => {
     const listItemDRowOverrideStyle = itemWidth ? {width: itemWidth} : {};
     return (
         <View style={styles.listItemContainer}>
             <TouchableOpacity activeOpacity={noHoverEffect ? 1 : 0.9}>
-                <View style={[styles.listItem, style ? style : {}]}>
+                <View style={
+                        [
+                            styles.listItem, 
+                            style ? style : {},
+                            {borderRadius},
+                        ]
+                    }>
                     <View style={styles.listItemTop}>
                         <Text style={styles.listItemTitle}>{panelTitleLabel}</Text>
                         {panelTitleValue && <Text style={styles.listItemSubTitle}>{panelTitleValue}</Text>}
@@ -62,7 +69,8 @@ const styles = StyleSheet.create({
         shadowOpacity: 0.5,
         elevation: 5,
         position:'relative',
-        backgroundColor: '#000000'
+        backgroundColor: '#000000',
+        overflow: 'hidden'
     },
     listItemTop: {
         padding: listItemPadding,

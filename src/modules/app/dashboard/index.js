@@ -20,7 +20,7 @@ const lists = [
     {name: 'Fixed Deposit', navigation: NAVIGATION.DEPOSITE_LIST, icon: icons.FDIcon},
     {name: 'Loan Request', icon: icons.LoanReqIcon, navigation: NAVIGATION.COMMING_SOON},
     {name: 'My Loans', navigation: NAVIGATION.MY_LOANS, icon: icons.MyLoansIcon},
-    // {name: 'FD Calculator', icon: icons.FDCalcIcon},
+    {name: 'FD Calculator', icon: icons.FDCalcIcon, navigation: NAVIGATION.FD_CALCULATER},
     {name: 'Certificate', icon: icons.CertificateIcon, navigation: NAVIGATION.CERTIFICATE_LIST},
     // {name: 'Activity', icon: icons.ActivityIcon},
     // {name: 'Application Status', icon: icons.AppStatusIcon},

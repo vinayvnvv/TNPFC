@@ -14,6 +14,22 @@ class Utils {
         }
     }
 
+    domain_from_url(url) {
+        var result;
+        var match;
+        if (match = url.match(/^(?:https?:\/\/)?(?:[^@\n]+@)?(?:www\.)?([^:\/\n\?\=]+)/im)) {
+            result = match[1];
+            if (match = result.match(/^[^\.]+\.(.+\..+)$/)) {
+                result = match[1];
+            }
+        }
+        return result;
+    }
+
+    convertToINRFormat(number) {
+        return String(number).replace(/(\d)(?=(\d\d)+\d$)/g, "$1,");
+    }
+
     getPieChartAsHTML(slices) {
         let cumulativePercent = 0;
 

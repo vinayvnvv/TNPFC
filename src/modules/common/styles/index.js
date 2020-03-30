@@ -1,4 +1,5 @@
 import {Platform, StatusBar, StyleSheet} from 'react-native'
+import { THEME } from '../../../../config'
 
 export const COMMON_STYLES = StyleSheet.create({
     mainContainer: {
@@ -18,5 +19,8 @@ export const COMMON_STYLES = StyleSheet.create({
     spinnerContainerFullScreenText: {
         marginTop: 9,
         fontSize: 16,
+    },
+    textPrimary: {
+        color: THEME.PRIMARY,
     }
 })

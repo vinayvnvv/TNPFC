@@ -1,7 +1,7 @@
 import axios from 'axios';
 import { CONFIG } from '../../config';
 const {API} = CONFIG;
-const HOST = API.HOST;
+const {HOST, HDFC_TRASACTIONS_STATUS} = API;
 class APIService {
     token;
     customerId;
@@ -74,6 +74,20 @@ class APIService {
     }
     fetchRequestStatus() {
         return axios.post(HOST + 'requestStatus', {customerId: this.customerId}, this.getConfig());
+    }
+    fetchProductDetails() {
+        return axios.post(HOST + 'getProductDetails', {}, this.getConfig());
+    }
+    getPGPayload(data) {
+        data['customerId'] = this.customerId;
+        return axios.post(HOST + 'getPGPayload', data, this.getConfig());
+    }
+    paymentSucess(transactionId) {
+        return axios.post(HOST + 'paymentSucess', {transactionId});
+    }
+    getTxnDetails(merchantId, txnId) {
+        console.log('getTxnDetails', merchantId, txnId);
+        return axios.post(HDFC_TRASACTIONS_STATUS + `getTxnDetails?merchantId=${merchantId}&txnId=${txnId}`);
     }
 }
 export default new APIService();

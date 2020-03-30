@@ -70,7 +70,7 @@ class Login extends React.Component {
             console.log('send', panNumber);
             apiServices.getOTP(panNumber).then(res => {
                 const {data} = res;
-                if(data.responseCode === '200') {
+                if(data.responseCode !== '404') {
                     console.log('suuccess', data.response.otp);
                     this.setState({
                         otpSent: true,
@@ -78,9 +78,14 @@ class Login extends React.Component {
                         canReSendOtp: false,
                         verifying: false,
                     }, () => {
-                        setTimeout(()=>{
-                            this.setState({otpTextFieldValue: data.response.otp + ''})
-                        }, 1300);
+                        // setTimeout(()=>{
+                        //     this.setState({otpTextFieldValue: data.response.otp + ''})
+                        // }, 1300);
+                        // SmsRetriever.addSmsListener(event => {
+                        //     console.log('SmsRetriever.addSmsListener', event.message);
+                        //     SmsRetriever.removeSmsListener();
+                        //   }); 
+
                         
                         if(debugMode) {
                             Toast.show({

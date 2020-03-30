@@ -11,7 +11,10 @@ export const CONFIG = {
         }
     },
     API: {
-        HOST: 'http://13.233.57.109:3001/tnpfc/v1/',
+        // HOST: 'http://13.233.57.109:3001/tnpfc/v1/',
+        // HOST: 'https://portal-api.tnpowerfinance.com/tnpfc/v1/',
+        HOST: 'https://test-node-api.tnpowerfinance.com/tnpfc/v1/',
+        HDFC_TRASACTIONS_STATUS: 'https://hdfcprodsigning.in/onepayVAS/',
     }
 }
 const THEME = CONFIG.APP.THEME;
