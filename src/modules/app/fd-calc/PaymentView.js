@@ -1,5 +1,5 @@
 import React from 'react';
-import { Container, Content, Text, Header, Left, Body, Title, Right, Image } from 'native-base';
+import { Container, Content, Text, Header, Left, Body, Title, Right, Image, View } from 'native-base';
 import WebView from 'react-native-webview';
 import {StyleSheet, Platform, Dimensions, BackHandler, Alert} from 'react-native';
 import { THEME } from '../../../../config';
@@ -100,7 +100,7 @@ class PaymentView extends React.Component {
                     </Body>
                     <Right />
                 </Header>
-                <Content style={styles.container}>
+                <View style={styles.container}>
                     <Text style={styles.info}>Dont click Back button untill transaction completes.</Text>
                     {Platform.OS === 'web' ? (
                         <iframe style={{height: '100%'}} src={'http://google.com'}/>
@@ -111,7 +111,7 @@ class PaymentView extends React.Component {
                             source={{html}} />
                     )}
                     
-                </Content>
+                </View>
             </Container>
         )
     }

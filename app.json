@@ -16,7 +16,7 @@
     "splash": {
       "image": "./assets/splash.png",
       "resizeMode": "contain",
-      "backgroundColor": "#ffffff"
+      "backgroundColor": "#355ead"
     },
     "updates": {
       "fallbackToCacheTimeout": 0
@@ -26,7 +26,7 @@
     ],
     "androidStatusBar": {
       "barStyle": "light-content",
-      "backgroundColor": "#ffffff"
+      "backgroundColor": "#355ead"
     },
     "android": {
       "package": "com.tnpfc.mobile",

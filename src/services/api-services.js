@@ -21,7 +21,7 @@ class APIService {
         this.customerId = customerId;
     }
     getOTP(panNumber) {
-        return axios.post(HOST + 'otplogin', {panNumber});
+        return axios.post(HOST + 'otplogin', {panNumber, channel: 'app'});
     }
     verifyOTP(otp, panNumber) {
         return axios.post(HOST + 'verifyotp', {otp, panNumber});

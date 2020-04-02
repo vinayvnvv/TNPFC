@@ -10,13 +10,8 @@ import * as Font from 'expo-font';
 import { Ionicons } from '@expo/vector-icons';
 import { store, persistor } from './src/store';
 import { MenuProvider } from 'react-native-popup-menu';
-
-const Loading = () => (
-  <View>
-    <Text>Loading</Text>
-  </View>
-)
-
+import { StatusBar } from 'react-native';
+import LoadingApp from './src/modules/common/components/loading-app';
 
 class App extends React.Component {
   state = {
@@ -30,7 +25,7 @@ class App extends React.Component {
     });
     this.setState({
       isReady: true,
-    })
+    });
   }
   render() {
     return (
@@ -45,7 +40,7 @@ class App extends React.Component {
                 </StyleProvider>
               </MenuProvider>
           ) : (
-            <Loading />
+            <LoadingApp />
           )}
           
         </PersistGate>

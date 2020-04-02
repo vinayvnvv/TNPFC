@@ -73,7 +73,7 @@ class FDCalc extends React.Component {
     }
     async componentDidMount() {
         this.setState({init: false});
-        const {productDetails, fetchProductDetails, use} = this.props;
+        const {productDetails, fetchProductDetails, userDetails} = this.props;
         if(!productDetails) await fetchProductDetails();
         this.setState({init: true});
         this.selectScheme(schemeOptions[0].value);

@@ -4,7 +4,7 @@ import {NavigationContainer} from '@react-navigation/native';
 import {createStackNavigator} from '@react-navigation/stack';
 import Login from './modules/login/Login';
 import authServices from './services/authServices';
-import {setAuth} from './store/actions/auth-actions';
+import {setAuth, removeAuth, loadAuth} from './store/actions/auth-actions';
 import {fetchCustomerDetails} from './store/actions/common-actions';
 import DashBoard from './modules/app/dashboard';
 import { NAVIGATION } from './navigation';
@@ -18,6 +18,7 @@ import CertificateList from './modules/app/certificate-list';
 import ViewCertificate from './modules/app/certificate-list/view-certificate';
 import fdCalc from './modules/app/fd-calc';
 import PaymentView from './modules/app/fd-calc/PaymentView';
+import LoadingApp from './modules/common/components/loading-app';
 const Stack = createStackNavigator();
 class Index extends React.Component {
     state = {
@@ -33,8 +34,9 @@ class Index extends React.Component {
     }
 
     checkLogin = async () => {
-        const {setAuth} = this.props;
+        const {setAuth, loadAuth, removeAuth} = this.props;
         return new Promise(async (res) => {
+            loadAuth();
             const data = await authServices.getAuth();
             if(data) {
                 setAuth(data.token, data.customerId);
@@ -42,6 +44,7 @@ class Index extends React.Component {
                 this.initApp();
             } else {
                 res(false);
+                removeAuth();
             }
         });
     }
@@ -56,7 +59,11 @@ class Index extends React.Component {
                     {!token ? (
                         <Stack.Screen
                             name="Login"
-                            component={Login}
+                            component={
+                                token === null ? 
+                                    LoadingApp :
+                                    Login
+                            }
                             options={{title: ''}}
                             />
                     ) : (
@@ -111,7 +118,7 @@ const mapStateToProps = state => ({
 
 export default connect(
     mapStateToProps,
-    {setAuth, fetchCustomerDetails}
+    {setAuth, fetchCustomerDetails, removeAuth, loadAuth}
 )(Index);
 
 

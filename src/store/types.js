@@ -5,6 +5,7 @@ const TEST = {
 const AUTH = {
     TOKEN: 'AUTH_TOKEN',
     REMOVE: 'AUTH_REMOVE',
+    LOAD: 'LOAD',
 }
 
 const COMMON = {
