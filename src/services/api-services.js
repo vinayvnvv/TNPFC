@@ -9,7 +9,7 @@ class APIService {
         const token = this.token || {};
         const config = {
             headers: {
-                'Authorization': token || '',
+                'x-access-token': token || '',
                 'Content-Type': 'application/json',
             }
         }
@@ -83,7 +83,7 @@ class APIService {
         return axios.post(HOST + 'getPGPayload', data, this.getConfig());
     }
     paymentSucess(transactionId) {
-        return axios.post(HOST + 'paymentSucess', {transactionId});
+        return axios.post(HOST + 'paymentSucess', {transactionId}, this.getConfig());
     }
     getTxnDetails(merchantId, txnId) {
         console.log('getTxnDetails', merchantId, txnId);

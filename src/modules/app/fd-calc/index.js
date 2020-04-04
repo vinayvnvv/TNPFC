@@ -715,6 +715,7 @@ const mapStateToProps = state => ({
     productDetails: state.commonReducer.productDetails,
     userDetails: state.commonReducer.userDetails,
     fdSummary: state.depositeReducer.fdSummary,
+    token: state.authReducer.token,
 })
 
 export default connect(

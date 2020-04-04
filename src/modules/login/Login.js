@@ -177,8 +177,8 @@ class Login extends React.Component {
         const {setAuth} = this.props;
         const {response} = data || {};
         if(response) {
-            await authServices.setAuth(response.token, response.customerId);
-            setAuth(response.token, response.customerId);
+            await authServices.setAuth(response.authToken, response.customerId);
+            setAuth(response.authToken, response.customerId);
         }
     }
     render() {
