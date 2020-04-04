@@ -12,7 +12,7 @@ const LoadingApp = () => {
 }
 const styles = StyleSheet.create({
     container: {
-        backgroundColor: 'trasnparent',
+        backgroundColor: 'transparent',
         flex: 1,
         alignItems: 'center',
         justifyContent: 'center'

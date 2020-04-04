@@ -2,10 +2,10 @@ import React from 'react';
 import {connect} from 'react-redux';
 import {NavigationContainer} from '@react-navigation/native';
 import {createStackNavigator} from '@react-navigation/stack';
-import Login from './modules/login/Login';
 import authServices from './services/authServices';
 import {setAuth, removeAuth, loadAuth} from './store/actions/auth-actions';
 import {fetchCustomerDetails} from './store/actions/common-actions';
+import Login from './modules/login/Login';
 import DashBoard from './modules/app/dashboard';
 import { NAVIGATION } from './navigation';
 import {DepositeList} from './modules/app/deposite';
@@ -19,6 +19,8 @@ import ViewCertificate from './modules/app/certificate-list/view-certificate';
 import fdCalc from './modules/app/fd-calc';
 import PaymentView from './modules/app/fd-calc/PaymentView';
 import LoadingApp from './modules/common/components/loading-app';
+import StartScreen from './modules/common/components/start-screen';
+import CreateFD from './modules/create-fd';
 const Stack = createStackNavigator();
 class Index extends React.Component {
     state = {
@@ -57,15 +59,26 @@ class Index extends React.Component {
                         headerShown: false
                     }}>
                     {!token ? (
-                        <Stack.Screen
-                            name="Login"
-                            component={
-                                token === null ? 
-                                    LoadingApp :
-                                    Login
-                            }
-                            options={{title: ''}}
-                            />
+                        <>
+                            {/* <Stack.Screen
+                                name={NAVIGATION.START}
+                                component={
+                                    token === null ? 
+                                        LoadingApp :
+                                        StartScreen
+                                }
+                                options={{title: ''}}
+                                />
+                            <Stack.Screen
+                                name={NAVIGATION.LOGIN}
+                                component={Login}
+                                options={{title: ''}}
+                                /> */}
+                            <Stack.Screen
+                                name={NAVIGATION.CREATE_FD}
+                                component={CreateFD}
+                                />
+                        </>
                     ) : (
                         <>
                             <Stack.Screen
