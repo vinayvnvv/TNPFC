@@ -14,10 +14,17 @@ function createForm(formOptions = {}) {
             rules = {};
             localData = {};
             errors = {};
-            fieldErrInit = {};
+            fieldTouched = {};
+            isSubmit = false;
             initValidate = formOptions.showErrosOnInit ? true : false;
             defaultValueProp = formOptions.defaultValueProp ? formOptions.defaultValueProp : null;
             instance = {};
+            componentDidMount() {
+                if(formOptions.showErrosOnInit) {
+                    this.setErrors();
+                    this.forceUpdate();
+                }
+            }
             addField = (name, options) => {
                 this.formValues[name] = options && options.initialValue ? options.initialValue : '';
                 if(options && options.rules) this.rules[name] = options.rules;
@@ -32,23 +39,23 @@ function createForm(formOptions = {}) {
                                         defaultValueProp === '-' ? e : e.target[defaultValueProp]
                                     ) : e.target.value;
                 this.formValues[field] = value;
+                // if(this.initValidate) {
+                    this.setErrors(field, true);
+                // }
                 if(options && options.onValueChange) options.onValueChange(value);
-                this.forceUpdate();
-                if(this.initValidate) this.setErrors(field);
                 if(formOptions && formOptions.onValueChanges) {
-                    formOptions.onValueChanges({[field]: value}, this.formValues, {...this.props});
+                    formOptions.onValueChanges({[field]: value}, this.formValues, this.getErrors(), this.props);
                 }
+                this.forceUpdate();
             }
-            setErrors = (field) => {
+            setErrors = (field, noUpdate) => {
                 var validator = new schema(this.rules);
                 validator.validate(this.formValues, (err, fields) => {
-                    if(field) {
-                        if(fields[field]) this.errors[field] = fields[field];
-                        else this.errors[field] = null;
-                    } else {
-                        this.errors = fields;
+                    if(field && !this.fieldTouched[field]) {
+                        this.fieldTouched[field] = true;
                     }
-                    this.forceUpdate();
+                    this.errors = fields;
+                    if(!noUpdate) this.forceUpdate();
                 });
             }
             createField(_this, name, options = defaultFieldOptions) {
@@ -59,7 +66,6 @@ function createForm(formOptions = {}) {
                     options && options.valueProp ? options : {valueProp: _this.defaultValueProp} , 
                     'set'
                 );
-                console.log('valueProp', valueProp)
                 const props = {
                     [options && options.trigger ? options.trigger : DEFAULT_TRIGGER]: (e) => {
                         _this.onFormChange(name, options, e);
@@ -67,9 +73,20 @@ function createForm(formOptions = {}) {
                     [valueProp ? valueProp : 'value']: _this.formValues[name],
                 }
                 return ele => {
+                    const parentProps = ele._owner ? ele._owner.pendingProps : {};
                     return formOptions && formOptions.template ? 
-                                (formOptions.template(name, React.cloneElement(ele, {...props}), this.getProps(), this.localData[name])) :
+                                (formOptions.template(this.getFieldStatus(name), React.cloneElement(ele, {...props}), this.getProps(), this.localData[name], parentProps)) :
                                 React.cloneElement(ele, {...props})
+                }
+            }
+
+            getFieldStatus = (field) => {
+                const errors = this.errors || {};
+                return {
+                    name: field,
+                    touched: this.fieldTouched[field],
+                    error: errors[field],
+                    isSubmit: this.isSubmit,
                 }
             }
 
@@ -113,6 +130,7 @@ function createForm(formOptions = {}) {
                     if(!this.initValidate) {
                         this.initValidate = true;
                     }
+                    this.isSubmit = true;
                     this.setErrors();
                     callback(err, this.formValues);
                 });
@@ -125,6 +143,10 @@ function createForm(formOptions = {}) {
                 }
             }
 
+            getErrors = () => {
+                return this.errors;
+            }
+
             getProps = () => {
                 return {
                         createField: (name, options) => this.createField(this, name, options),
@@ -132,7 +154,8 @@ function createForm(formOptions = {}) {
                         validateForm: this.validateForm,
                         resetFields: this.resetFields,
                         errors: this.errors,
-                        setFieldValue: this.setFieldValue
+                        setFieldValue: this.setFieldValue,
+                        getErrors: this.getErrors,
                     }
             }
             render() {

@@ -9,6 +9,12 @@ export const CREATE_FD_STYLES = StyleSheet.create({
         color: '#000000',
         fontWeight: '700'
     },
+    sectionSubTitle: {
+        fontSize: 13,
+        color: '#666',
+        marginTop: -9,
+        marginBottom: 9,
+    },
     sectionContent: {
 
     },

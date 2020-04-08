@@ -38,7 +38,7 @@ const StartScreen = ({
                 </Text>
                 <View style={{height: 32}}/>
                 <Button style={styles.btn} iconRight primary onPress={()=>navigate(NAVIGATION.CREATE_FD)}>
-                    <Text>Create Fixed Deposit</Text>
+                    <Text>New User (Create FD)</Text>
                     <Icon name='arrow-forward' />
                 </Button>
                 <Button style={styles.btn} iconRight warning onPress={()=>navigate(NAVIGATION.LOGIN)}>

@@ -9,6 +9,8 @@ const FormItem = ({
     focusOutEvent = 'onBlur',
     isErr,
     errText,
+    onFocusOut,
+    disabled,
 }) => {
     const [isFocus, setFocus] = useState(false);
     const inputProps = {
@@ -22,14 +24,18 @@ const FormItem = ({
     if(focusOutEvent) {
         inputProps[focusOutEvent] = () => {
             setFocus(false);
+            if(onFocusOut) onFocusOut();
         }
     }
     return (
         <>
-            <View style={[
+            <View 
+                pointerEvents={disabled ? 'none' : 'auto'}
+                style={[
                         styles.formItem, 
                         isFocus ? styles.formItemFocus : {},
                         isErr ? styles.formErr : {}, 
+                        disabled ? styles.formItemDisabled : {},
                     ]}>
                 <View style={styles.label}>
                     <Text style={[
@@ -64,6 +70,9 @@ const styles = StyleSheet.create({
         marginBottom: 23,
         position: 'relative',
         minHeight: inputMinHeight,
+    },
+    formItemDisabled: {
+        backgroundColor: '#f0f0f0',
     },
     formItemFocus: {
         borderWidth: 2,

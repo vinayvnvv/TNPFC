@@ -40,6 +40,13 @@ export const getFdCalcInitValues = () => ({
     interest: interestOptions[0].value,
     amount: '25000',
 });
+
+export const getInterestPayment = payment => {
+    if(payment === interestOptions[0].value) return 12;
+    if(payment === interestOptions[1].value) return 90;
+    if(payment === interestOptions[2].value) return 360;
+    if(payment === interestOptions[3].value) return 0;
+}
         
 
 class FDCalculater extends React.Component {
@@ -49,9 +56,16 @@ class FDCalculater extends React.Component {
         periodOptionsData: periodOptions,
         interestOptionsData: interestOptions,
     }
+    ROI;
 
     componentDidMount() {
         this.selectScheme(schemeOptions[0].value);
+    }
+
+    componentWillReceiveProps(prevProps) {
+        if(this.props.productDetails !== prevProps.productDetails) {
+            this.selectScheme(schemeOptions[0].value);
+        }
     }
 
     onFormChange = (field, value, callback) => {
@@ -66,6 +80,12 @@ class FDCalculater extends React.Component {
         });
      }
 
+    onSeniorChange = v => {
+        this.onFormChange('isSenior', !this.state.form.isSenior, () => {
+            this.calculateMaturity();
+        });
+    }
+
     onAmountChange = v => {
         this.onFormChange('amount', v);
         const amount = parseInt(v);
@@ -74,13 +94,12 @@ class FDCalculater extends React.Component {
             err = 'Amount should be multiple of 1000';
         } else if(amount < 25000) {
             err = 'Amount should be more than of 25,000';
-        } else if(amount > 50000) {
-            err = 'Amount should not be more than of 50,000';
         } else {
             err = false;
         }
         this.setState({amountErr: err}, () => {
-            this.callToParent();
+            // this.callToParent();
+            this.calculateMaturity();
         });
         
     }
@@ -107,39 +126,48 @@ class FDCalculater extends React.Component {
         }
     }
     selectPeriod = type => {
+        let interestOptionsData = interestOptions; 
+        let selectInterestType;
         if(this.state.form.scheme === schemeOptions[0].value) {
             if(type > 24) {
-                let interestOptionsData = interestOptions;
+                // interestOptionsData = interestOptions;
                 delete interestOptionsData[0]['disabled'];
                 delete interestOptionsData[1]['disabled'];
                 delete interestOptionsData[2]['disabled'];
                 interestOptionsData[3]['disabled'] = true;
-                this.setState({interestOptionsData}, () => {
-                    this.selectInterest(interestOptions[0].value);
-                });
+                selectInterestType = interestOptions[0].value;
+                // this.setState({interestOptionsData}, () => {
+                //     this.selectInterest(interestOptions[0].value);
+                // });
                 
 
             } else {
-                let interestOptionsData = interestOptions;
+                // interestOptionsData = interestOptions;
                 interestOptionsData[0]['disabled'] = true;
                 delete interestOptionsData[1]['disabled'];
                 interestOptionsData[2]['disabled'] = true;
                 interestOptionsData[3]['disabled'] = true;
-                this.setState({interestOptionsData}, () => {
-                    this.selectInterest(interestOptions[1].value);
-                });
+                selectInterestType = interestOptions[1].value;
+                // this.setState({interestOptionsData}, () => {
+                //     this.selectInterest(interestOptions[1].value);
+                // });
             }
         } else {
-            let interestOptionsData = interestOptions;
+            // interestOptionsData = interestOptions;
             delete interestOptionsData[3]['disabled'];
             interestOptionsData[0]['disabled'] = true;
             interestOptionsData[1]['disabled'] = true;
             interestOptionsData[2]['disabled'] = true;
-            this.setState({interestOptionsData}, () => {
-                this.selectInterest(interestOptions[3].value);
-            });   
+            selectInterestType = interestOptions[3].value;
+            // this.setState({interestOptionsData}, () => {
+            //     this.selectInterest(interestOptions[3].value);
+            // });   
         }
-        this.onFormChange('period', type);
+        this.setState({interestOptionsData}, () => {
+            this.onFormChange('period', type, () => {
+                this.selectInterest(selectInterestType);
+            });
+        });
     }
     selectInterest = type => {
         console.log('selectInterest', type);
@@ -181,6 +209,7 @@ class FDCalculater extends React.Component {
             ROI = selectedProduct && selectedProduct["onMaturityRate "] ? 
                     selectedProduct["onMaturityRate "] : 0;
         }
+        this.ROI = ROI;
         let maturityAmount = 0;
         if (productName === 'RIPS') {
             let interestAmount = ((Number(depositAmount) * Number(ROI)/1200))* Number(selectedProduct.tenure);
@@ -209,7 +238,7 @@ class FDCalculater extends React.Component {
         console.log('callToParent', this.props);
         const {onChange} = this.props;
         if(onChange) {
-            onChange(this.state.form, this.state.maturityAmount, this.state.amountErr, this.getMaturityDate());
+            onChange(this.state.form, this.state.maturityAmount, this.state.amountErr, this.getMaturityDate(), this.ROI);
         }
     }
 
@@ -236,7 +265,7 @@ class FDCalculater extends React.Component {
                     <View style={styles.formRHF}>
                         <CheckBox 
                             onChange={()=> {
-                                if(seniorFreeSelect) this.onFormChange('isSenior', !isSenior)
+                                if(seniorFreeSelect) this.onSeniorChange();
                             }}
                             checked={isSenior}/>
                     </View>

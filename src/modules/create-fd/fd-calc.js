@@ -9,19 +9,24 @@ import moment from 'moment';
 
 const FDCalc = ({
     productDetails,
+    data,
     onSubmit,
 }) => {
-    const [form, setFormValues] = useState(getFdCalcInitValues());
+    useEffect(() => {
+        if(data) setFormValues(data);
+    }, [data]);
+    const [form, setFormValues] = useState(data ? data : getFdCalcInitValues());
     const [calcValues, setCalcValues] = useState({});
-    const onFDCalcValueChange = (form, maturityAmount, formErr, maturityDate) => {
+    const onFDCalcValueChange = (form, maturityAmount, formErr, maturityDate, ROI) => {
         console.log(form, maturityAmount, formErr, maturityDate);
         setFormValues(form);
-        setCalcValues({maturityAmount, formErr, maturityDate});
+        setCalcValues({maturityAmount, formErr, maturityDate, ROI});
     }
     const validate = callback => {
         const otherValues = {
             maturityAmount: calcValues.maturityAmount,
             maturityDate: calcValues.maturityDate,
+            ROI: calcValues.ROI,
         }
         callback(calcValues.formErr, {
             ...form,
@@ -36,6 +41,7 @@ const FDCalc = ({
             <FDCalculater 
                 productDetails={productDetails} 
                 seniorFreeSelect
+                initData={form}
                 onChange={onFDCalcValueChange}
                 noMargin/>
             <View style={{height: 9}}/>

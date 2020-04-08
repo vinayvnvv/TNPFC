@@ -291,7 +291,7 @@ class Login extends React.Component {
                                         otpSending ? (
                                             <Spinner />
                                         ) : (
-                                            <Button success block onPress={this.sendOTP}>
+                                            <Button disabled={!panNumber} success block onPress={this.sendOTP}>
                                                 <Text style={styles.loginBtn}>Get OTP</Text>
                                             </Button>
                                         )

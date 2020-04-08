@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useState} from 'react';
 import { StyleSheet, Image } from 'react-native';
 import { THEME } from '../../../config';
 import { View, DatePicker, Picker, Text, Button, Icon } from 'native-base';
@@ -24,12 +24,20 @@ const profilePicUploadOption = {
 const PersonalInfo = ({
     form: {
         createField, getFieldsValue, setFieldValue, validateForm,
+        getErrors,
     },
     onPreviousStep,
     onSubmit,
     data,
+    panStatus,
+    validatePan,
+    aadharStatus,
+    validateAadhar,
+    residentList,
 }) => {
-    console.log(getFieldsValue());
+    const errors = getErrors() || {};
+    const [isSubmit, setIsSubmit] = useState(false);
+    let panVal = false;
     const pickImage = async (field) => {
         let options = {
             mediaTypes: ImagePicker.MediaTypeOptions.Images,
@@ -47,12 +55,80 @@ const PersonalInfo = ({
     }
     {createField('pan_image', {
         initialValue: data && data.pan_image,
+        rules: [
+            {required: true, message: 'Pan Card proof is required!'}
+        ]
     })}
     {createField('profile_image', {
         initialValue: data && data.profile_image,
+        rules: [
+            {required: true, message: 'Profile Image is required!'}
+        ]
     })}
     const onFormSubmit = () => {
+        if(!isSubmit) setIsSubmit(true);
         onSubmit(validateForm);
+    }
+    
+    const doValidatePan = () => {
+        const val = getFieldsValue('pan');
+        let valid = false;
+        if(REGEX.PAN.PATTERN.test(val)) {
+            const errors = getErrors();
+            if(errors) {
+                let errField;
+                if(errors['dob']) {
+                    errField = 'Date of birth';
+                }
+                if(errors['mobile']) {
+                    errField = 'Mobile number';
+                }
+                if(errors['last_name']) {
+                    errField = 'Last Name';
+                }
+                if(errors['first_name']) {
+                    errField = 'First Name';
+                }
+                if(errField) {
+                    valid = errField + ' is required for PAN validation.';
+                }
+            } 
+        }
+        return valid;
+    }
+    panVal = doValidatePan();
+
+    if(!panVal && panStatus === null) {
+        const {first_name, last_name, dob, pan} = getFieldsValue();
+        if(REGEX.PAN.PATTERN.test(pan)) {
+            validatePan(pan, first_name + ' ' + last_name, dob);
+        }
+    } 
+
+    if(aadharStatus === null) {
+        const {aadhaar} = getFieldsValue();
+        if(REGEX.AADHAAR.PATTERN.test(aadhaar)) {
+            validateAadhar(aadhaar);
+        }
+    }
+
+    const onBlurAadhar = () => {
+        const val = getFieldsValue('aadhaar');
+        if(REGEX.AADHAAR.PATTERN.test(val)) {
+            const {aadhaar} = getFieldsValue();
+            validateAadhar(aadhaar);
+        }
+    }
+    
+    const onBlurPan = () => {
+        let panValid = doValidatePan();
+        if(!panValid) {
+            const val = getFieldsValue('pan');
+            if(REGEX.PAN.PATTERN.test(val)) {
+                const {first_name, last_name, dob, pan} = getFieldsValue();
+                validatePan(pan, first_name + ' ' + last_name, dob);
+            }
+        }
     }
     return (
         <View style={styles.container}>
@@ -61,6 +137,7 @@ const PersonalInfo = ({
                 <View style={CREATE_FD_STYLES.sectionContent}>
                     {createField('first_name', {
                         trigger: TEXT_INPUT_TRIGGER,
+                        // initialValue: 'VIJAYKUMAR',
                         initialValue: data && data.first_name,
                         rules: [
                             {required: true, message: 'First Name is required.'},
@@ -69,11 +146,12 @@ const PersonalInfo = ({
                         localData: {
                             label: 'First Name',
                         }
-                    })(<TextInput placeholder={'Enter First Name'}/>)}
+                    })(<TextInput placeholder={'Enter First Name'} />)}
 
                     {createField('last_name', {
                         trigger: TEXT_INPUT_TRIGGER,
                         initialValue: data && data.last_name,
+                        // initialValue: 'KUNNATH',
                         rules: [
                             {required: true, message: 'First Name is required.'},
                             {pattern: REGEX.NAME_WITH_SPACE.PATTERN, message: REGEX.NAME_WITH_SPACE.MESSAGE('Last Name')}
@@ -85,6 +163,7 @@ const PersonalInfo = ({
 
                     {createField('dob', {
                         trigger: 'onDateChange',
+                        initialValue: Platform.OS === 'web' ? new Date('05-29-1967') : (data && data.dob),
                         localData: {
                             label: 'DOB',
                         },
@@ -97,7 +176,7 @@ const PersonalInfo = ({
 
                     {createField('gender', {
                         trigger: 'onValueChange',
-                        initialValue: data && data.gender,
+                        initialValue: (data && data.gender) || 'MALE',
                         valueProp: '=selectedValue',
                         localData: {
                             label: 'Gender',
@@ -109,14 +188,14 @@ const PersonalInfo = ({
                         placeholder="Select Gender"
                         selectedValue={getFieldsValue('gender')}
                         mode={'dropdown'}>
-                            <Picker.Item label="Male" value="male" />
-                            <Picker.Item label="Female" value="female" />
-                            <Picker.Item label="Others" value="others" />
+                            <Picker.Item label="Male" value="MALE" />
+                            <Picker.Item label="Female" value="FEMALE" />
+                            <Picker.Item label="Others" value="OTHERS" />
                     </Picker>)}
 
                     {createField('residence', {
                         trigger: 'onValueChange',
-                        initialValue: data && data.residence,
+                        initialValue: (data && data.residence) || (residentList && residentList[2] && residentList[2].residentCode),
                         valueProp: '=selectedValue',
                         localData: {
                             label: 'Residential',
@@ -128,10 +207,10 @@ const PersonalInfo = ({
                         placeholder="Select Residential Status"
                         selectedValue={getFieldsValue('gender')}
                         mode={'dropdown'}>
-                            {residenceOptions.map((item, idx) =>
+                            {residentList && residentList.map((item, idx) =>
                                 <Picker.Item 
-                                    label={item.label} 
-                                    value={item.value} 
+                                    label={item.residentName} 
+                                    value={item.residentCode} 
                                     key={idx + 'resident'} /> 
                             )}
                     </Picker>)}
@@ -139,6 +218,7 @@ const PersonalInfo = ({
                     {createField('mobile', {
                         trigger: TEXT_INPUT_TRIGGER,
                         initialValue: data && data.mobile,
+                        // initialValue: '7045843647',
                         localData: {
                             label: 'Mobile Number',
                         },
@@ -164,30 +244,64 @@ const PersonalInfo = ({
 
             <View style={CREATE_FD_STYLES.section}>
                 <Text style={CREATE_FD_STYLES.sectionTitle}>Identification</Text>
+                <Text style={CREATE_FD_STYLES.sectionSubTitle}>(Fill Basis details to validate)</Text>
                 <View style={CREATE_FD_STYLES.sectionContent}>
                     {createField('aadhaar', {
                         trigger: TEXT_INPUT_TRIGGER,
+                        // initialValue: '830910399777',
                         initialValue: data && data.aadhaar,
                         localData: {
                             label: 'Aadhaar No',
+                            onFocusOut: () => {
+                                if(aadharStatus !== 'loading') onBlurAadhar();
+                            },
+                            disabled: (props) => {
+                                if(!props) return false;
+                                return props.aadharStatus === true || props.aadharStatus === 'loading';
+                            },
                         },
                         rules: [
                             {required: true, message: 'Aadhaar No is required.'},
-                            {pattern: REGEX.AADHAAR.PATTERN, message: REGEX.AADHAAR.MESSAGE()}
+                            {pattern: REGEX.AADHAAR.PATTERN, message: REGEX.AADHAAR.MESSAGE()},
                         ],
-                    })(<TextInput placeholder={'Enter Aadhaar'}/>)}
+                    })(<TextInput 
+                            editable={aadharStatus !== 'loading' && aadharStatus !== true}
+                            placeholder={'Enter Aadhaar'}/>)}
+                    {aadharStatus === true && <Text style={[styles.successTextSub, {marginBottom: 25}]}>Aadhaar number is verified.</Text>}
+                    {(!errors || !errors['aadhaar']) && aadharStatus === 'loading' && <Text style={styles.infoTextSub}>Verifying Aadhaar number..</Text>}
+                    {!errors['aadhaar'] && aadharStatus && aadharStatus !== 'loading' && <Text style={styles.errTextSub}>{aadharStatus}</Text>}
 
                     {createField('pan', {
                         trigger: TEXT_INPUT_TRIGGER,
+                        // initialValue: 'ARRPK7194H',
                         initialValue: data && data.pan,
                         localData: {
                             label: 'PAN No',
+                            onFocusOut: () => {
+                                if(panStatus !== 'loading') onBlurPan();
+                            },
+                            disabled: (props) => {
+                                if(!props) return false;
+                                return props.panStatus === true || props.panStatus === 'loading';
+                            }
                         },
+                        // onValueChange: (v) => {
+                        //     if(v && !errors['pan']) validateForm();
+                        // },
                         rules: [
-                            {required: true, message: 'Aadhaar No is required.'},
+                            {required: true, message: 'PAN No is required.'},
                             {pattern: REGEX.PAN.PATTERN, message: REGEX.PAN.MESSAGE()}
                         ],
-                    })(<TextInput placeholder={'Enter PAN no'}/>)}
+                    })(<TextInput 
+                        placeholder={'Enter PAN no'} 
+                        selectTextOnFocus={panStatus !== 'loading'}
+                        editable={panStatus !== 'loading' && panStatus !== true}/>)}
+                    {panVal && <Text style={styles.errTextSub}>{panVal}</Text>}
+                    {panStatus === true && <Text style={styles.successTextSub}>PAN number is verified.</Text>}
+                    {(!errors || !errors['pan']) && panStatus === 'loading' && <Text style={styles.infoTextSub}>Verifying PAN number..</Text>}
+                    {/* {!panVal && panStatus === null && <Text style={styles.errTextSub}>Loading</Text>} */}
+                    {!errors['pan'] && !panVal && panStatus && panStatus !== 'loading' && <Text style={styles.errTextSub}>{panStatus}</Text>}
+                    
                 </View>
             </View>
 
@@ -204,6 +318,7 @@ const PersonalInfo = ({
                         </Button>
                     ) : <></>}
                 </View>
+                
                 <View style={CREATE_FD_STYLES.sectionContent}>
                     {getFieldsValue('pan_image') ? (
                         <>
@@ -220,6 +335,9 @@ const PersonalInfo = ({
                         </TouchableOpacity>
                     )}
                 </View>
+                {isSubmit && errors && errors['pan_image'] && !getFieldsValue('pan_image') && (
+                    <Text style={styles.err}>{errors['pan_image'][0].message}</Text>
+                )}
             </View>
 
             <View style={CREATE_FD_STYLES.section}>
@@ -251,6 +369,9 @@ const PersonalInfo = ({
                         </TouchableOpacity>
                     )}
                 </View>
+                {isSubmit && errors && errors['profile_image'] && !getFieldsValue('profile_image') && (
+                    <Text style={styles.err}>{errors['profile_image'][0].message}</Text>
+                )}
             </View>
 
             <StepNavigation 
@@ -301,19 +422,43 @@ const styles = StyleSheet.create({
         alignContent: 'center',
         alignSelf: 'center',
         borderRadius: 200,
-    }
+    },
+    errTextSub: {
+        fontSize: 12,
+        color: THEME.DANGER,
+        marginTop: -19,
+    },
+    infoTextSub: {
+        fontSize: 12,
+        color: THEME.INFO,
+        marginTop: -19,
+        marginBottom: 7,
+        fontWeight: '700',
+    },
+    successTextSub: {
+        fontSize: 12,
+        color: THEME.SUCCESS,
+        fontWeight: '700',
+        marginTop: -19,
+        marginBottom: 9,
+    },
+    err: {
+        color: THEME.DANGER,
+        fontSize: 12,
+    },
 });
 
 export default createForm({
     showErrosOnInit: true,
     defaultValueProp: Platform.OS === 'web' ? 'value' : '=value',
-    template: (field, input, form, data) => {
-        const {errors} = form;
-        const err = errors && errors[field];
+    template: (field, input, form, data, props) => {
+        const {error, touched, isSubmit} = field;
         return <FormItem 
                     input={input} 
+                    onFocusOut={data.onFocusOut}
+                    disabled={data.disabled ? data.disabled(props) : false}
                     label={data.label} 
-                    errText={err ? errors[field][0].message : null}
-                    isErr={err ? true : false}/>
+                    errText={(error) ? error[0].message : null}
+                    isErr={(error && (touched || isSubmit)) ? true : false}/>
     }
 })(PersonalInfo);

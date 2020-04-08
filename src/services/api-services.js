@@ -5,8 +5,8 @@ const {HOST, HDFC_TRASACTIONS_STATUS} = API;
 class APIService {
     token;
     customerId;
-    getConfig() {
-        const token = this.token || {};
+    getConfig(token) {
+        token = token ? token : (this.token || {});
         const config = {
             headers: {
                 'x-access-token': token || '',
@@ -82,12 +82,36 @@ class APIService {
         data['customerId'] = this.customerId;
         return axios.post(HOST + 'getPGPayload', data, this.getConfig());
     }
-    paymentSucess(transactionId) {
-        return axios.post(HOST + 'paymentSucess', {transactionId}, this.getConfig());
+    paymentSucess(transactionId, token) {
+        return axios.post(HOST + 'paymentSucess', {transactionId}, this.getConfig(token));
     }
     getTxnDetails(merchantId, txnId) {
         console.log('getTxnDetails', merchantId, txnId);
         return axios.post(HDFC_TRASACTIONS_STATUS + `getTxnDetails?merchantId=${merchantId}&txnId=${txnId}`);
+    }
+    documentVerify(data) {
+        return axios.post(HOST + 'documentVerify', data, this.getConfig());
+    }
+    fetchStates() {
+        return axios.post(HOST + 'states', {}, this.getConfig());
+    }
+    fetchDistricts() {
+        return axios.post(HOST + 'districts', {}, this.getConfig());
+    }
+    fetchRelationshipList() {
+        return axios.post(HOST + 'getRelationshipList', {}, this.getConfig());
+    }
+    registerPhoneNumber(phoneNumber) {
+        return axios.post(HOST + 'registerPhoneNumber', {phoneNumber}, this.getConfig());
+    }
+    verifyRegisterPhonenumber(phoneNumber, otp) {
+        return axios.post(HOST + 'verifyRegisterPhonenumber', {phoneNumber, otp}, this.getConfig());
+    }
+    getResidentList() {
+        return axios.post(HOST + 'getResidentList', {}, this.getConfig());
+    }
+    createUser(data, token) {
+        return axios.post(HOST + 'createUser', data, this.getConfig(token));
     }
 }
 export default new APIService();

@@ -10,6 +10,7 @@ const StepNavigation = ({
     prevBtn,
     prevBtnProps = {},
     onPrev,
+    disableNext,
 }) => {
     return (
         <View style={styles.container}>
@@ -19,7 +20,14 @@ const StepNavigation = ({
                 </Button>
             )}
             {nextBtn && (
-                <Button style={styles.btn} iconRight onPress={onNext} {...nextBtnProps}>
+                <Button 
+                    style={[
+                        styles.btn,
+                        disableNext ? styles.disableBtn : {}
+                    ]} 
+                    disabled={disableNext} 
+                    iconRight 
+                    onPress={onNext} {...nextBtnProps}>
                     <Text>{nextBtn}</Text>
                     <Icon name='arrow-forward' />
                 </Button>
@@ -39,6 +47,9 @@ const styles = StyleSheet.create({
         flexGrow: 1,
         flex: 1,
         marginHorizontal: THEME.LAYOUT_PADDING
+    },
+    disableBtn: {
+        opacity: 0.5
     }
 });
 

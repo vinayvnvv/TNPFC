@@ -118,3 +118,59 @@ export const fetchProductDetails = () => {
         });
     }
 }
+
+export const fetchStates = () => {
+    return (dispatch) => {
+        apiServices.fetchStates().then(res => {
+            const {data} = res;
+            if(data && data.responseCode === '200') {
+                dispatch({
+                    type: COMMON.ON_FETCH_STATES,
+                    payload: data.response,
+                });
+            }
+        })
+    }
+}
+
+export const fetchDistricts = () => {
+    return (dispatch) => {
+        apiServices.fetchDistricts().then(res => {
+            const {data} = res;
+            if(data && data.responseCode === '200') {
+                dispatch({
+                    type: COMMON.ON_FETCH_DISTRICTS,
+                    payload: data.response,
+                });
+            }
+        })
+    }
+}
+
+export const fetchRelationshipList = () => {
+    return (dispatch) => {
+        apiServices.fetchRelationshipList().then(res => {
+            const {data} = res;
+            if(data && data.responseCode === '200') {
+                dispatch({
+                    type: COMMON.ON_FETCH_RELATIONSHIP,
+                    payload: data.response,
+                });
+            }
+        })
+    }
+}
+
+export const getResidentList = () => {
+    return (dispatch) => {
+        apiServices.getResidentList().then(res => {
+            const {data} = res;
+            if(data) {
+                dispatch({
+                    type: COMMON.ON_FETCH_RESIDENT_STATUS,
+                    payload: data.response,
+                });
+            }
+        })
+    }
+}

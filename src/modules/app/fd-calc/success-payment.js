@@ -11,6 +11,7 @@ const SuccessPayment = ({
     onCompleteClick,
     transactionStatus,
     goToStep,
+    completeText,
     pgPayloadData: {
         transactionId,
     } = {}
@@ -87,7 +88,7 @@ const SuccessPayment = ({
                     </View>
                     <View style={{height: 21}} />
                     <Button block onPress={onCompleteClick}>
-                        <Text>Complete Profile</Text>
+                        <Text>{completeText ? completeText : 'Complete Profile'}</Text>
                     </Button>
                 </View>
             )}

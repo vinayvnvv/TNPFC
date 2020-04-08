@@ -4,7 +4,7 @@ import {NavigationContainer} from '@react-navigation/native';
 import {createStackNavigator} from '@react-navigation/stack';
 import authServices from './services/authServices';
 import {setAuth, removeAuth, loadAuth} from './store/actions/auth-actions';
-import {fetchCustomerDetails} from './store/actions/common-actions';
+import {fetchCustomerDetails, fetchStates, fetchDistricts, fetchRelationshipList, getResidentList} from './store/actions/common-actions';
 import Login from './modules/login/Login';
 import DashBoard from './modules/app/dashboard';
 import { NAVIGATION } from './navigation';
@@ -28,6 +28,16 @@ class Index extends React.Component {
     }
     async componentDidMount() {
         await this.checkLogin();
+        const {
+            fetchStates, 
+            fetchDistricts, 
+            fetchRelationshipList,
+            getResidentList,
+        } = this.props;
+        fetchStates();
+        fetchDistricts();
+        fetchRelationshipList();
+        getResidentList();
     }
 
     initApp = () => {
@@ -60,7 +70,7 @@ class Index extends React.Component {
                     }}>
                     {!token ? (
                         <>
-                            {/* <Stack.Screen
+                            <Stack.Screen
                                 name={NAVIGATION.START}
                                 component={
                                     token === null ? 
@@ -73,11 +83,17 @@ class Index extends React.Component {
                                 name={NAVIGATION.LOGIN}
                                 component={Login}
                                 options={{title: ''}}
-                                /> */}
+                                />
                             <Stack.Screen
                                 name={NAVIGATION.CREATE_FD}
                                 component={CreateFD}
                                 />
+                             <Stack.Screen
+                                options={{
+                                    headerLeft: null,
+                                }}
+                                name={NAVIGATION.PAYMENT_PAGE}
+                                component={PaymentView} />
                         </>
                     ) : (
                         <>
@@ -131,7 +147,16 @@ const mapStateToProps = state => ({
 
 export default connect(
     mapStateToProps,
-    {setAuth, fetchCustomerDetails, removeAuth, loadAuth}
+    {
+        setAuth, 
+        fetchCustomerDetails, 
+        removeAuth, 
+        loadAuth, 
+        fetchStates, 
+        fetchDistricts, 
+        fetchRelationshipList,
+        getResidentList,
+    }
 )(Index);
 
 

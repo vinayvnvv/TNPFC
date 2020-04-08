@@ -82,6 +82,44 @@ class Utils {
                     </body>
                 </html>`;
         }
+
+        getPaymentHTML(data) {
+            return `
+                <div>
+                    <form #form ngNoForm action="https://hdfcprodsigning.in/onepayVAS/payprocessorV2" method="POST">
+                                    
+                        <input type="text" type="hidden" name="reqData" value="${data.reqData}">
+                        <input type="text" type="hidden" name="merchantId" value="${data.merchantId}">
+                    
+                    </form>
+                    <div class="_load">
+                        <h1>Loading</h1>
+                    </div>
+                </div>
+                    <style>
+                        input {
+                            height: 0px;
+                            width: 0px;
+                            pointer-events: none;
+                            opacity: 0;
+                        }
+                        ._load {
+                            position: fixed;
+                            top: 0;
+                            left: 0;
+                            height: 100%;
+                            width: 100%;
+                            background-color: #fff;
+                            display: flex;
+                            align-items: center;
+                            justify-content: center;
+                        }
+                    </style>
+                    <script>
+                        window.document.forms[0].submit();
+                    </script>
+                `;
+        }
 }
 
 export default new Utils();
