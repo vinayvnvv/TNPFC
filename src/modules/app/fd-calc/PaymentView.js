@@ -1,5 +1,5 @@
 import React from 'react';
-import { Container, Content, Text, Header, Left, Body, Title, Right, Image } from 'native-base';
+import { Container, Content, Text, Header, Left, Body, Title, Right, Image, View } from 'native-base';
 import WebView from 'react-native-webview';
 import {StyleSheet, Platform, Dimensions, BackHandler, Alert} from 'react-native';
 import { THEME } from '../../../../config';
@@ -26,10 +26,18 @@ class PaymentView extends React.Component {
     }
     
     handleBackButtonClick() {
-        const {navigation} = this.props;
+        const {
+            navigation,
+            route : {
+                params: {
+                    onCancel,
+                } = {},
+            } = {},
+        } = {} = this.props;
         Alert.alert('Warning', 'Are you sure to cancel transaction?', [
             {text: 'Yes', onPress: () => {
                 BackHandler.removeEventListener('hardwareBackPress', this.handleBackButtonClick);
+                onCancel();
                 navigation.goBack();
             }},
             {text: 'No', onPress: () => console.log('No'), style: 'cancel'},
@@ -100,7 +108,7 @@ class PaymentView extends React.Component {
                     </Body>
                     <Right />
                 </Header>
-                <Content style={styles.container}>
+                <View style={styles.container}>
                     <Text style={styles.info}>Dont click Back button untill transaction completes.</Text>
                     {Platform.OS === 'web' ? (
                         <iframe style={{height: '100%'}} src={'http://google.com'}/>
@@ -111,7 +119,7 @@ class PaymentView extends React.Component {
                             source={{html}} />
                     )}
                     
-                </Content>
+                </View>
             </Container>
         )
     }

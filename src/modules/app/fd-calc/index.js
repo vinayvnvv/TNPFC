@@ -19,28 +19,7 @@ import { NAVIGATION } from '../../../navigation';
 import SuccessPayment from './success-payment';
 import PersonalInfo from '../deposite/personal-info';
 import { fetchFDSummary } from '../../../store/actions/deposite-actions';
-
-const CATEGORY = {
-    GENERAL: 'GENERAL_CATEGORY',
-    SENIOR: 'SENIOR_CITIZENS'
-};
-const schemeOptions = [
-    {label: 'RIPS', value: 'rips'},
-    {label: 'CIPS', value: 'cips'},
-];
-const periodOptions = [
-    {label: '12', value: 12},
-    {label: '24', value: 24},
-    {label: '36', value: 36},
-    {label: '48', value: 48},
-    {label: '60', value: 60},
-];
-const interestOptions = [
-    {label: 'Monthly', value: 'month'},
-    {label: 'Quarterly', value: 'quarter'},
-    {label: 'Annually', value: 'Annual'},
-    {label: 'On Maturity', value: 'maturity'},
-];
+import FDCalculater, { getFdCalcInitValues } from '../../common/components/fd-calculater';
 
 class FDCalc extends React.Component {
     state = {
@@ -50,22 +29,14 @@ class FDCalc extends React.Component {
         selected: '',
         acceptTerms: false,
         maturityAmount: 0,
-        form: {
-            isSenior: false,
-            scheme: schemeOptions[0].value,
-            period: periodOptions[0].value,
-            interest: interestOptions[0].value,
-            amount: '25000',
-        },
-        periodOptionsData: periodOptions,
-        interestOptionsData: interestOptions,
-        amountErr: false,
+        form: getFdCalcInitValues(),
+        maturityDate: null,
+        formErr: false,
         paymentType: 'card',
         txnDetails: null,
         transactionStatus: null,
         initStep3Status: false,
     }
-    selectedProduct;
     pgPayloadData;
     goBack = () => {
         const {navigation} = this.props;
@@ -73,10 +44,9 @@ class FDCalc extends React.Component {
     }
     async componentDidMount() {
         this.setState({init: false});
-        const {productDetails, fetchProductDetails, use} = this.props;
+        const {productDetails, fetchProductDetails, userDetails} = this.props;
         if(!productDetails) await fetchProductDetails();
         this.setState({init: true});
-        this.selectScheme(schemeOptions[0].value);
         if(userDetails) {
             if(userDetails.customerCategory === 'SENIOR_CITIZENS') {
                 this.onFormChange('isSenior', true);
@@ -86,150 +56,9 @@ class FDCalc extends React.Component {
     onChangeState = (f, v) => {
         this.setState({[f]: v});
     }
-    onFormChange = (field, value, callback) => {
-       this.setState(update(this.state, {
-           form: {
-               [field]: {
-                   $set: value,
-               }
-           }
-       }), () => {
-           if(callback) callback();
-       });
-    }
-    onAmountChange = v => {
-        this.onFormChange('amount', v);
-        const amount = parseInt(v);
-        let err = false;
-        if(amount%1000 !== 0) {
-            err = 'Amount should be multiple of 1000';
-        } else if(amount < 25000) {
-            err = 'Amount should be more than of 25,000';
-        } else if(amount > 50000) {
-            err = 'Amount should not be more than of 50,000';
-        } else {
-            err = false;
-        }
-        this.setState({amountErr: err});
-        
-    }
-
-    getMaturityDate = () => {
-        const {form: {period}} = this.state;
-        let currentDate = new Date();
-        let maturityDate =  currentDate.setMonth(currentDate.getMonth() + period );
-        return moment(maturityDate).format('DD/MM/YYYY');
-    }
-    selectScheme = type => {
-        if(type === schemeOptions[0].value) {
-            this.onFormChange('scheme', type, () => {
-                let periodOptionsData = periodOptions;
-                periodOptionsData[0]['disabled'] = true;
-                this.setState({
-                    periodOptionsData,
-                }, () => {
-                    this.selectPeriod(periodOptions[1].value);
-                })
-            });
-        } else {
-            this.onFormChange('scheme', type, () => {
-                let periodOptionsData = periodOptions;
-                delete periodOptionsData[0]['disabled'];
-                this.setState({periodOptionsData}, () => {
-                    this.selectPeriod(periodOptions[0].value);
-                });
-            });  
-        }
-    }
-    selectPeriod = type => {
-        if(this.state.form.scheme === schemeOptions[0].value) {
-            if(type > 24) {
-                let interestOptionsData = interestOptions;
-                delete interestOptionsData[0]['disabled'];
-                delete interestOptionsData[1]['disabled'];
-                delete interestOptionsData[2]['disabled'];
-                interestOptionsData[3]['disabled'] = true;
-                this.setState({interestOptionsData}, () => {
-                    this.selectInterest(interestOptions[0].value);
-                });
-                
-
-            } else {
-                let interestOptionsData = interestOptions;
-                interestOptionsData[0]['disabled'] = true;
-                delete interestOptionsData[1]['disabled'];
-                interestOptionsData[2]['disabled'] = true;
-                interestOptionsData[3]['disabled'] = true;
-                this.setState({interestOptionsData}, () => {
-                    this.selectInterest(interestOptions[1].value);
-                });
-            }
-        } else {
-            let interestOptionsData = interestOptions;
-            delete interestOptionsData[3]['disabled'];
-            interestOptionsData[0]['disabled'] = true;
-            interestOptionsData[1]['disabled'] = true;
-            interestOptionsData[2]['disabled'] = true;
-            this.setState({interestOptionsData}, () => {
-                this.selectInterest(interestOptions[3].value);
-            });   
-        }
-        this.onFormChange('period', type);
-    }
-    selectInterest = type => {
-        console.log('selectInterest', type);
-        this.onFormChange('interest', type, () => {
-            this.calculateMaturity();
-        });
-    }
-    calculateMaturity = () => {
-        const {productDetails} = this.props;
-        if(!(productDetails && productDetails.length > 0 && Array.isArray(productDetails))) return;
-        let productName = this.state.form.scheme;
-        if(productName === schemeOptions[0].value) {
-            productName = 'RIPS'
-        } else {
-            productName = 'CIPS I'
-        }
-        let category = this.state.isSenior ? CATEGORY.SENIOR : CATEGORY.GENERAL;
-        let period = this.state.form.period;
-        let depositAmount = this.state.form.amount;
-        let interestPayment = this.state.form.interest;
-        let selectedProduct = productDetails.find((product) => {
-            if (product.categoryId === category 
-              && product.productAliasName === productName
-              &&  product.tenure === period ) {
-                return true;
-            }
-        });
-        this.selectedProduct = selectedProduct;
-        let ROI = 0;
-        if (interestPayment === 'month') {
-            ROI = selectedProduct.monthlyIntRate;
-        } else if (interestPayment === 'quarter') {
-            ROI = selectedProduct.quarterlyIntRate;
-        } else if (interestPayment === 'annual') {
-            ROI = selectedProduct.yearlyIntRate;
-        } else if (interestPayment === 'maturity') {
-            ROI = selectedProduct["onMaturityRate "];
-        }
-        let maturityAmount = 0;
-        if (productName === 'RIPS') {
-            let interestAmount = ((Number(depositAmount) * Number(ROI)/1200))* Number(selectedProduct.tenure);
-            maturityAmount = Math.floor(Number(depositAmount) + interestAmount);
-        } else {
-            let tenure = selectedProduct.tenure / 12;
-            maturityAmount = Number(depositAmount) * Math.pow(1 + (Number(ROI) / (12 * 100)), 12 *  tenure);
-            maturityAmount = Math.floor(Number(maturityAmount));
-        }
-        console.log('maturityAmount', maturityAmount);
-        this.setState({
-            maturityAmount,
-        })
-    }
     isFormValid = () => {
-        const {amountErr, acceptTerms} = this.state;
-        return !amountErr && acceptTerms;
+        const {formErr, acceptTerms} = this.state;
+        return !formErr && acceptTerms;
     }
     onPaymentClick = () => {
         if(!this.selectedProduct) return;
@@ -257,7 +86,8 @@ class FDCalc extends React.Component {
             ROI = this.selectedProduct.yearlyIntRate;
             interestPayment = 360;
         } else if (interest === 'maturity') {
-            ROI = this.selectedProduct["onMaturityRate "];
+            ROI = this.selectedProduct && this.selectedProduct["onMaturityRate "] ? 
+                        this.selectedProduct["onMaturityRate "] : 0;
             interestPayment = 0;
         }
         let channel = 'web';
@@ -377,6 +207,17 @@ class FDCalc extends React.Component {
         // navigation.navigate(NAVIGATION.DEPOSITE_LIST);
         navigation.navigate(NAVIGATION.FD_DETAILS, {selectedDeposite: fdSummary[0]});
     }
+
+    onCalcValueChange = (form, maturityAmount, formErr, maturityDate) => {
+        console.log('onChange');
+        console.log(form);
+        this.setState({
+            form,
+            maturityAmount,
+            formErr,
+            maturityDate,
+        })
+    }
     render() {
         const {
             form: {
@@ -386,9 +227,10 @@ class FDCalc extends React.Component {
                 amount,
                 interest,
             },
+            maturityDate,
             periodOptionsData,
             interestOptionsData,
-            amountErr,
+            formErr,
             init,
             maturityAmount,
             acceptTerms,
@@ -398,7 +240,7 @@ class FDCalc extends React.Component {
             transactionStatus,
             initStep3Status,
         } = this.state;
-        const {fdSummary, userDetails} = this.props;
+        const {fdSummary, userDetails, productDetails} = this.props;
         return (
             init ? (
                 <Container>
@@ -428,7 +270,8 @@ class FDCalc extends React.Component {
                         </View>
                         {currentStep === 0 && (
                             <ScrollView style={styles.content}> 
-                                <View style={styles.calc}>
+                                <FDCalculater onChange={this.onCalcValueChange} productDetails={productDetails}/>
+                                {/* <View style={styles.calc}>
                                     <View style={styles.formRH}>
                                         <View style={styles.formRHF}>
                                             <CheckBox 
@@ -445,9 +288,6 @@ class FDCalc extends React.Component {
                                     </View>
 
                                     <View style={styles.formR}>
-                                        {/* <View style={styles.formRL}>
-                                            <Text style={styles.formRLT}>Enter Amount</Text>
-                                        </View> */}
                                         <View style={styles.formRF}>
                                             <Item fixedLabel>
                                                 <Label style={[styles.formRLT, {fontSize: 15}]}>Enter Amount:</Label>
@@ -498,7 +338,7 @@ class FDCalc extends React.Component {
                                                 data={interestOptionsData} />
                                         </View>
                                     </View>
-                                </View>
+                                </View> */}
 
 
                                 <View style={styles.depositeInfo}>
@@ -510,7 +350,7 @@ class FDCalc extends React.Component {
                                             ['Deposit Amount', utils.convertToINRFormat(amount)],
                                             ['Maturity Amount', utils.convertToINRFormat(maturityAmount)], 
                                             ['Start Date', moment(new Date()).format('DD/MM/YYYY')],
-                                            ['Maturity Date', this.getMaturityDate()],
+                                            ['Maturity Date', maturityDate],
                                             ['Interest Payment', (maturityAmount - amount)],
                                             ['Months', period],
                                         ]}
@@ -715,6 +555,7 @@ const mapStateToProps = state => ({
     productDetails: state.commonReducer.productDetails,
     userDetails: state.commonReducer.userDetails,
     fdSummary: state.depositeReducer.fdSummary,
+    token: state.authReducer.token,
 })
 
 export default connect(

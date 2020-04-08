@@ -9,6 +9,9 @@ import utils from '../../../services/utils';
 const Steps = ({
     steps = [],
     currentStep = 0,
+    hideLabel = false,
+    noShadow = false,
+    numberIndication = false,
 }) => {
     return (
         <View style={styles.container}>
@@ -27,12 +30,23 @@ const Steps = ({
                             
                             <View 
                                 style={[
+                                        !noShadow ? {...utils.getBoxShadow(9, '#000')} : {},
                                         styles.itemIconC,
                                         currentStep === idx ? styles.itemIconCActive : {},
                                         currentStep > idx ? styles.itemIconCComplete : {},
+                                        numberIndication ? styles.itemIconCIsNumber : {},
                                     ]}>
                                         {currentStep > idx && (
-                                            <Icon name={'checkmark'} style={styles.itemIcon}/>
+                                            <Icon name={'checkmark'} style={[
+                                                styles.itemIcon,
+                                                numberIndication ? styles.itemIconIsNumber : {},
+                                            ]}/>
+                                        )}
+                                        {!(currentStep > idx) && numberIndication && (
+                                            <Text style={[
+                                                styles.number,
+                                                {color: '#fff'}
+                                            ]}>{idx + 1}</Text>
                                         )}
                             </View>
                             {idx !== (steps.length - 1) && (
@@ -45,16 +59,18 @@ const Steps = ({
                             )}
                             
                         </View>
-                        <View style={styles.itemB}>
-                            <Text 
-                                style={[
-                                        styles.itemLabel,
-                                        currentStep === idx ? styles.itemLabelActive : {},
-                                        currentStep > idx ? styles.itemLabelComplete : {},
-                                    ]}>
-                                    {item.label}
-                            </Text>
-                        </View>
+                        {!hideLabel && (
+                            <View style={styles.itemB}>
+                                <Text 
+                                    style={[
+                                            styles.itemLabel,
+                                            currentStep === idx ? styles.itemLabelActive : {},
+                                            currentStep > idx ? styles.itemLabelComplete : {},
+                                        ]}>
+                                        {item.label}
+                                </Text>
+                            </View>
+                        )}
                     </View>
                 </View>
             )}
@@ -106,7 +122,6 @@ const styles = StyleSheet.create({
         right: 0,
     },
     itemIconC: {
-        ...utils.getBoxShadow(9, '#000'),
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'center',
@@ -117,6 +132,14 @@ const styles = StyleSheet.create({
         borderRadius: 22,
         zIndex: 2,
     },
+    itemIconCIsNumber:{
+        width: 28,
+        height: 28,   
+    },
+    number: {
+        fontSize: 16,
+        fontWeight: '700',
+    },
     itemIconCComplete: {
         backgroundColor: THEME.SUCCESS,
     },
@@ -126,6 +149,9 @@ const styles = StyleSheet.create({
     itemIcon: {
         fontSize: 12,
         color: THEME.PRIMARY_INVERT
+    },
+    itemIconIsNumber: {
+        fontSize: 16,
     },
     itemLabel: {
         fontWeight: '700',

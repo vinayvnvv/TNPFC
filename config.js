@@ -8,6 +8,7 @@ export const CONFIG = {
             SUCCESS: '#36b28a',
             ORANGE: '#eb9d3f',
             DANGER: '#ce3c3e',
+            INFO: '#17a2b8'
         }
     },
     API: {

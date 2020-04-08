@@ -12,6 +12,14 @@ export const setAuth = (token, customerId) => {
     }
 }
 
+export const loadAuth = () => {
+    return (dispatch) => {
+        dispatch({
+            type: TYPES.AUTH.LOAD,
+        })
+    }
+}
+
 export const removeAuth = () => {
     return (dispatch) => {
         dispatch({

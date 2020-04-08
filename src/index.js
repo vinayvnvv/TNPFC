@@ -2,10 +2,10 @@ import React from 'react';
 import {connect} from 'react-redux';
 import {NavigationContainer} from '@react-navigation/native';
 import {createStackNavigator} from '@react-navigation/stack';
-import Login from './modules/login/Login';
 import authServices from './services/authServices';
-import {setAuth} from './store/actions/auth-actions';
-import {fetchCustomerDetails} from './store/actions/common-actions';
+import {setAuth, removeAuth, loadAuth} from './store/actions/auth-actions';
+import {fetchCustomerDetails, fetchStates, fetchDistricts, fetchRelationshipList, getResidentList} from './store/actions/common-actions';
+import Login from './modules/login/Login';
 import DashBoard from './modules/app/dashboard';
 import { NAVIGATION } from './navigation';
 import {DepositeList} from './modules/app/deposite';
@@ -18,6 +18,9 @@ import CertificateList from './modules/app/certificate-list';
 import ViewCertificate from './modules/app/certificate-list/view-certificate';
 import fdCalc from './modules/app/fd-calc';
 import PaymentView from './modules/app/fd-calc/PaymentView';
+import LoadingApp from './modules/common/components/loading-app';
+import StartScreen from './modules/common/components/start-screen';
+import CreateFD from './modules/create-fd';
 const Stack = createStackNavigator();
 class Index extends React.Component {
     state = {
@@ -25,6 +28,16 @@ class Index extends React.Component {
     }
     async componentDidMount() {
         await this.checkLogin();
+        const {
+            fetchStates, 
+            fetchDistricts, 
+            fetchRelationshipList,
+            getResidentList,
+        } = this.props;
+        fetchStates();
+        fetchDistricts();
+        fetchRelationshipList();
+        getResidentList();
     }
 
     initApp = () => {
@@ -33,8 +46,9 @@ class Index extends React.Component {
     }
 
     checkLogin = async () => {
-        const {setAuth} = this.props;
+        const {setAuth, loadAuth, removeAuth} = this.props;
         return new Promise(async (res) => {
+            loadAuth();
             const data = await authServices.getAuth();
             if(data) {
                 setAuth(data.token, data.customerId);
@@ -42,6 +56,7 @@ class Index extends React.Component {
                 this.initApp();
             } else {
                 res(false);
+                removeAuth();
             }
         });
     }
@@ -54,11 +69,32 @@ class Index extends React.Component {
                         headerShown: false
                     }}>
                     {!token ? (
-                        <Stack.Screen
-                            name="Login"
-                            component={Login}
-                            options={{title: ''}}
-                            />
+                        <>
+                            <Stack.Screen
+                                name={NAVIGATION.START}
+                                component={
+                                    token === null ? 
+                                        LoadingApp :
+                                        StartScreen
+                                }
+                                options={{title: ''}}
+                                />
+                            <Stack.Screen
+                                name={NAVIGATION.LOGIN}
+                                component={Login}
+                                options={{title: ''}}
+                                />
+                            <Stack.Screen
+                                name={NAVIGATION.CREATE_FD}
+                                component={CreateFD}
+                                />
+                             <Stack.Screen
+                                options={{
+                                    headerLeft: null,
+                                }}
+                                name={NAVIGATION.PAYMENT_PAGE}
+                                component={PaymentView} />
+                        </>
                     ) : (
                         <>
                             <Stack.Screen
@@ -111,7 +147,16 @@ const mapStateToProps = state => ({
 
 export default connect(
     mapStateToProps,
-    {setAuth, fetchCustomerDetails}
+    {
+        setAuth, 
+        fetchCustomerDetails, 
+        removeAuth, 
+        loadAuth, 
+        fetchStates, 
+        fetchDistricts, 
+        fetchRelationshipList,
+        getResidentList,
+    }
 )(Index);
 
 
