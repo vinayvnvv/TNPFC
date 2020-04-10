@@ -196,7 +196,8 @@ class CreateFD extends React.Component {
         const data = {
             "number": pan,
             "name": name,
-            "dob": moment(dob).format('DD/MM/YYYY'),
+            // "dob": moment(dob).format('DD/MM/YYYY'),
+            "dob": moment(dob).toISOString(),
             "type": "pan"
         };
         this.setState({panStatus: 'loading'});
