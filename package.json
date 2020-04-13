@@ -27,7 +27,7 @@
     "react-native": "https://github.com/expo/react-native/archive/sdk-36.0.0.tar.gz",
     "react-native-gesture-handler": "~1.5.0",
     "react-native-image-picker": "^2.3.1",
-    "react-native-modal": "^11.5.4",
+    "react-native-modal": "^11.5.6",
     "react-native-pdf": "^5.0.9",
     "react-native-pdf-view": "^0.3.2",
     "react-native-popup-menu": "^0.15.7",

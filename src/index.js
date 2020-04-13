@@ -21,6 +21,7 @@ import PaymentView from './modules/app/fd-calc/PaymentView';
 import LoadingApp from './modules/common/components/loading-app';
 import StartScreen from './modules/common/components/start-screen';
 import CreateFD from './modules/create-fd';
+import AddService from './modules/app/service-request/add-service';
 const Stack = createStackNavigator();
 class Index extends React.Component {
     state = {
@@ -97,7 +98,7 @@ class Index extends React.Component {
                         </>
                     ) : (
                         <>
-                            <Stack.Screen
+                            {/* <Stack.Screen
                                 name={NAVIGATION.DASHBOARD}
                                 component={DashBoard} />
                             <Stack.Screen
@@ -111,8 +112,8 @@ class Index extends React.Component {
                                 component={fdDetails} />
                             <Stack.Screen
                                 name={NAVIGATION.MY_LOANS}
-                                component={MyLoans} />
-                            <Stack.Screen
+                                component={MyLoans} /> */}
+                            {/* <Stack.Screen
                                 name={NAVIGATION.SERVICE_REQUEST}
                                 component={serviceRequest} />
                             <Stack.Screen
@@ -132,7 +133,10 @@ class Index extends React.Component {
                                     headerLeft: null,
                                 }}
                                 name={NAVIGATION.PAYMENT_PAGE}
-                                component={PaymentView} />
+                                component={PaymentView} /> */}
+                            <Stack.Screen
+                                name={NAVIGATION.ADD_SERVICE}
+                                component={AddService} />
                         </>
                     )}
                 </Stack.Navigator>
