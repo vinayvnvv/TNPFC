@@ -12,6 +12,7 @@ const initialState = {
     districts: [],
     relationships: [],
     residentList: [],
+    addressProofDocs: [],
 };
 
 
@@ -96,6 +97,11 @@ const commonReducer = (state = initialState, action) => {
             return {
                 ...state,
                 residentList: action.payload
+            }
+        case COMMON.ON_FETCH_ADDRESS_PROOF_DOCS:
+            return {
+                ...state,
+                addressProofDocs: action.payload
             }
         
         default: 

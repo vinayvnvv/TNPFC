@@ -4,7 +4,7 @@ import {NavigationContainer} from '@react-navigation/native';
 import {createStackNavigator} from '@react-navigation/stack';
 import authServices from './services/authServices';
 import {setAuth, removeAuth, loadAuth} from './store/actions/auth-actions';
-import {fetchCustomerDetails, fetchStates, fetchDistricts, fetchRelationshipList, getResidentList} from './store/actions/common-actions';
+import {fetchCustomerDetails, fetchStates, fetchDistricts, fetchRelationshipList, getResidentList, getAddressProofDocList} from './store/actions/common-actions';
 import Login from './modules/login/Login';
 import DashBoard from './modules/app/dashboard';
 import { NAVIGATION } from './navigation';
@@ -21,6 +21,9 @@ import PaymentView from './modules/app/fd-calc/PaymentView';
 import LoadingApp from './modules/common/components/loading-app';
 import StartScreen from './modules/common/components/start-screen';
 import CreateFD from './modules/create-fd';
+import Terms from './modules/common/components/terms';
+import RTGSScreen from './modules/create-fd/rtgs-screen';
+import Test from './modules/common/components/test';
 const Stack = createStackNavigator();
 class Index extends React.Component {
     state = {
@@ -33,11 +36,13 @@ class Index extends React.Component {
             fetchDistricts, 
             fetchRelationshipList,
             getResidentList,
+            getAddressProofDocList,
         } = this.props;
         fetchStates();
         fetchDistricts();
         fetchRelationshipList();
         getResidentList();
+        getAddressProofDocList();
     }
 
     initApp = () => {
@@ -94,6 +99,18 @@ class Index extends React.Component {
                                 }}
                                 name={NAVIGATION.PAYMENT_PAGE}
                                 component={PaymentView} />
+                            <Stack.Screen
+                                name={NAVIGATION.TERMS}
+                                component={Terms}
+                                />
+                            <Stack.Screen
+                                name={NAVIGATION.RTGS_SCREEN}
+                                component={RTGSScreen}
+                                />
+                            <Stack.Screen
+                                name={'TEST'}
+                                component={Test}
+                                />
                         </>
                     ) : (
                         <>
@@ -156,6 +173,7 @@ export default connect(
         fetchDistricts, 
         fetchRelationshipList,
         getResidentList,
+        getAddressProofDocList,
     }
 )(Index);
 

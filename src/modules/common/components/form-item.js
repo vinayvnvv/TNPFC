@@ -84,7 +84,7 @@ const styles = StyleSheet.create({
     },  
     label: {
         // minHeight: inputMinHeight,
-        width: '35%',
+        width: '40%',
         flexDirection: 'row',
         alignItems: 'center',
         paddingHorizontal: 13,
@@ -92,6 +92,7 @@ const styles = StyleSheet.create({
     labelText: {
         color: '#888',
         fontSize: 13,
+        marginRight: 21,
     },
     field: {
         flex: 1,

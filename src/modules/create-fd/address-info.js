@@ -90,7 +90,8 @@ class AddressInfo extends React.Component {
             districts,
             form: {
                 createField, getFieldsValue, errors,
-            }
+            },
+            addressProofDocs,
         } = this.props;
         const {sameAddress, isSubmit} = this.state;
         // const errors = getErrors();
@@ -112,7 +113,7 @@ class AddressInfo extends React.Component {
                                 {required: true, message: 'Address Line 1 is required.'},
                             ],
                             localData: {
-                                label: 'Address Line 1',
+                                label: 'Building/Apartment',
                             }
                         })(<TextInput placeholder={'Enter Address'} />)}
                         {createField('address_line_2', {
@@ -122,7 +123,7 @@ class AddressInfo extends React.Component {
                                 {required: true, message: 'Address Line 2 is required.'},
                             ],
                             localData: {
-                                label: 'Address Line 2',
+                                label: 'Location/Landmark',
                             }
                         })(<TextInput placeholder={'Enter Address'} />)}
     
@@ -206,6 +207,27 @@ class AddressInfo extends React.Component {
                                     </Button>
                                 ) : (<></>)}
                             </View>
+                            {createField('addressProofType', {
+                                trigger: 'onValueChange',
+                                initialValue: (permanent && permanent.addressProofType) || (addressProofDocs && addressProofDocs[0] && addressProofDocs[0].addressProofDocCode),
+                                valueProp: '=selectedValue',
+                                localData: {
+                                    label: 'Address Proof Type',
+                                },
+                                rules: [
+                                    {required: true, message: 'Address Proof Type is required.'},
+                                ],
+                            })(<Picker
+                                placeholder="Select Address Proof Type"
+                                selectedValue={getFieldsValue('addressProofType')}
+                                mode={'dropdown'}>
+                                    {addressProofDocs && addressProofDocs.map((item, idx) =>
+                                        <Picker.Item 
+                                            label={item.addressProofDocName} 
+                                            value={item.addressProofDocCode} 
+                                            key={idx + 'addressProofType'} /> 
+                                    )}
+                            </Picker>)}
                             <View style={CREATE_FD_STYLES.sectionContent}>
                                 {getFieldsValue('address_proof') ? (
                                     <>
@@ -347,7 +369,7 @@ const Address2FormComponent = ({
                     {required: true, message: 'Address Line 1 is required.'},
                 ],
                 localData: {
-                    label: 'Address Line 1',
+                    label: 'Building/Apartment',
                 }
             })(<TextInput placeholder={'Enter Address'} />)}
             {createField('address_line_2', {
@@ -357,7 +379,7 @@ const Address2FormComponent = ({
                     {required: true, message: 'Address Line 2 is required.'},
                 ],
                 localData: {
-                    label: 'Address Line 2',
+                    label: 'Location/Landmark',
                 }
             })(<TextInput placeholder={'Enter Address'} />)}
 

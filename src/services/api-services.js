@@ -82,8 +82,9 @@ class APIService {
         data['customerId'] = this.customerId;
         return axios.post(HOST + 'getPGPayload', data, this.getConfig());
     }
-    paymentSucess(transactionId, token) {
-        return axios.post(HOST + 'paymentSucess', {transactionId}, this.getConfig(token));
+    paymentSucess(transactionId, token, paymentType) {
+        console.log('calling paymentSucess-->', {transactionId, token, paymentType})
+        return axios.post(HOST + 'paymentSucess', {transactionId, paymentType}, this.getConfig(token));
     }
     getTxnDetails(merchantId, txnId) {
         console.log('getTxnDetails', merchantId, txnId);
@@ -112,6 +113,9 @@ class APIService {
     }
     createUser(data, token) {
         return axios.post(HOST + 'createUser', data, this.getConfig(token));
+    }
+    getAddressProofDocList() {
+        return axios.post(HOST + 'getAddressProofDocList', {}, this.getConfig());
     }
 }
 export default new APIService();

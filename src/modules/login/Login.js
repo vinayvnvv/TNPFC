@@ -225,7 +225,8 @@ class Login extends React.Component {
                                 <Image 
                                     source={icons.LoginWelcomeIcon} 
                                     style={styles.headerContainerImage}/>
-                                <Text style={styles.headerContainerTitle}>Login to {CONFIG.APP.TITLE}</Text>
+                                <Text style={styles.headerContainerTitle}>Tamil Nadu Power Finance and Infrastructure Development Corporation</Text>
+                                <Text style={styles.headerContainerTitle}>(A Tamil Nadu Government Enterprise)</Text>
                                 <Text style={styles.headerContainerSub}>
                                     Do not provide your credentials anywhere other than in this page
                                 </Text>
@@ -238,7 +239,7 @@ class Login extends React.Component {
                                 <View style={styles.formRow}>
                                     {/* <Text style={styles.formRowLabel} >PAN / Aadhar Number</Text> */}
                                     <Item floatingLabel>
-                                        <Label>PAN / Aadhaar Number</Label>
+                                        <Label>Enter PAN</Label>
                                         <Input 
                                             value={panNumber} 
                                             onChangeText={(text) => this.onFieldChange('panNumber', text)} />
@@ -292,7 +293,7 @@ class Login extends React.Component {
                                             <Spinner />
                                         ) : (
                                             <Button disabled={!panNumber} success block onPress={this.sendOTP}>
-                                                <Text style={styles.loginBtn}>Get OTP</Text>
+                                                <Text style={styles.loginBtn}>Request OTP</Text>
                                             </Button>
                                         )
                                     )}

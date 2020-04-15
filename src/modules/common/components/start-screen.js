@@ -26,7 +26,7 @@ const StartScreen = ({
         <Container style={styles.container}>
             <View style={styles.mask} />
             <View style={styles.content}>
-                <Text style={styles.title}>TNPFC</Text>
+                <Text style={styles.title}>Tamil Nadu Power Finance and Infrastructure Development Corporation</Text>
                 <Image 
                     style={styles.logo} 
                     source={require('./../../../../assets/logo.png')}/>
@@ -38,24 +38,24 @@ const StartScreen = ({
                 </Text>
                 <View style={{height: 32}}/>
                 <Button style={styles.btn} iconRight primary onPress={()=>navigate(NAVIGATION.CREATE_FD)}>
-                    <Text>New User (Create FD)</Text>
+                    <Text>I am a new Depositor</Text>
                     <Icon name='arrow-forward' />
                 </Button>
                 <Button style={styles.btn} iconRight warning onPress={()=>navigate(NAVIGATION.LOGIN)}>
-                    <Text>Depositor Login</Text>
+                    <Text>Exisiting Depositor Access</Text>
                     <Icon name='arrow-forward' />
                 </Button>
                 <View style={styles.btm}>
                     <Button 
                         transparent 
-                        onPress={() => openLink('https://www.tnpowerfinance.com/tnpfc-web/tnpfc-policy?selectedTab=3')}>
-                        <Text>IT Policy</Text>
+                        onPress={() => navigate(NAVIGATION.TERMS)}>
+                        <Text>Terms and conditions</Text>
                     </Button>
-                    <Button 
+                    {/* <Button 
                         onPress={() => openLink('https://www.tnpowerfinance.com/tnpfc-web/mandatory-disclosures')}
                         transparent>
                         <Text>Mandatory Disclosures</Text>
-                    </Button>
+                    </Button> */}
                 </View>
             </View>
         </Container>
@@ -78,9 +78,10 @@ const styles = StyleSheet.create({
     title: {
         position: "absolute",
         top: '12%',
-        fontSize: 25,
+        fontSize: 19,
         fontWeight: '700',
-        letterSpacing: 1,
+        textAlign: 'center',
+        paddingHorizontal: 41,
         color: '#fff',
     },
     logo: {
@@ -108,7 +109,7 @@ const styles = StyleSheet.create({
         marginTop: 3,
     },
     btn: {
-        width: '60%',
+        width: '68%',
         marginTop: 11,
         borderBottomRightRadius: 18,
     },

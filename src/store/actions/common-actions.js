@@ -174,3 +174,17 @@ export const getResidentList = () => {
         })
     }
 }
+
+export const getAddressProofDocList = () => {
+    return (dispatch) => {
+        apiServices.getAddressProofDocList().then(res => {
+            const {data} = res;
+            if(data) {
+                dispatch({
+                    type: COMMON.ON_FETCH_ADDRESS_PROOF_DOCS,
+                    payload: data.response,
+                });
+            }
+        })
+    }
+}

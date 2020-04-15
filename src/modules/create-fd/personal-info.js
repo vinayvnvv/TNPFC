@@ -83,9 +83,9 @@ const PersonalInfo = ({
                 if(errors['mobile']) {
                     errField = 'Mobile number';
                 }
-                if(errors['last_name']) {
-                    errField = 'Last Name';
-                }
+                // if(errors['last_name']) {
+                //     errField = 'Last Name';
+                // }
                 if(errors['first_name']) {
                     errField = 'First Name';
                 }
@@ -101,7 +101,7 @@ const PersonalInfo = ({
     if(!panVal && panStatus === null) {
         const {first_name, last_name, dob, pan} = getFieldsValue();
         if(REGEX.PAN.PATTERN.test(pan)) {
-            validatePan(pan, first_name + ' ' + last_name, dob);
+            validatePan(pan, first_name, dob);
         }
     } 
 
@@ -126,7 +126,7 @@ const PersonalInfo = ({
             const val = getFieldsValue('pan');
             if(REGEX.PAN.PATTERN.test(val)) {
                 const {first_name, last_name, dob, pan} = getFieldsValue();
-                validatePan(pan, first_name + ' ' + last_name, dob);
+                validatePan(pan, first_name, dob);
             }
         }
     }
@@ -137,21 +137,21 @@ const PersonalInfo = ({
                 <View style={CREATE_FD_STYLES.sectionContent}>
                     {createField('first_name', {
                         trigger: TEXT_INPUT_TRIGGER,
-                        // initialValue: 'VIJAYKUMAR',
+                        // initialValue: 'VIJAYKUMAR KUNNATH',
                         initialValue: data && data.first_name,
                         rules: [
-                            {required: true, message: 'First Name is required.'},
-                            {pattern: REGEX.NAME_WITH_SPACE.PATTERN, message: REGEX.NAME_WITH_SPACE.MESSAGE('First Name')}
+                            {required: true, message: 'Name is required.'},
+                            {pattern: REGEX.NAME_WITH_SPACE.PATTERN, message: REGEX.NAME_WITH_SPACE.MESSAGE('Name')}
                         ],
                         localData: {
-                            label: 'First Name',
+                            label: 'Name',
                         }
                     })(<TextInput placeholder={'Enter First Name'} />)}
 
-                    {createField('last_name', {
+                    {/* {createField('last_name', {
                         trigger: TEXT_INPUT_TRIGGER,
-                        initialValue: data && data.last_name,
-                        // initialValue: 'KUNNATH',
+                        // initialValue: data && data.last_name,
+                        initialValue: 'KUNNATH',
                         rules: [
                             {required: true, message: 'First Name is required.'},
                             {pattern: REGEX.NAME_WITH_SPACE.PATTERN, message: REGEX.NAME_WITH_SPACE.MESSAGE('Last Name')}
@@ -159,7 +159,7 @@ const PersonalInfo = ({
                         localData: {
                             label: 'Last Name',
                         }
-                    })(<TextInput placeholder={'Enter Last Name'}/>)}
+                    })(<TextInput placeholder={'Enter Last Name'}/>)} */}
 
                     {createField('dob', {
                         trigger: 'onDateChange',
@@ -244,7 +244,7 @@ const PersonalInfo = ({
 
             <View style={CREATE_FD_STYLES.section}>
                 <Text style={CREATE_FD_STYLES.sectionTitle}>Identification</Text>
-                <Text style={CREATE_FD_STYLES.sectionSubTitle}>(Fill Basis details to validate)</Text>
+                {/* <Text style={CREATE_FD_STYLES.sectionSubTitle}>(Fill Basis details to validate)</Text> */}
                 <View style={CREATE_FD_STYLES.sectionContent}>
                     {createField('aadhaar', {
                         trigger: TEXT_INPUT_TRIGGER,
@@ -307,7 +307,7 @@ const PersonalInfo = ({
 
             <View style={CREATE_FD_STYLES.section}>
                 <View style={CREATE_FD_STYLES.sectionTitleC}>
-                    <Text style={CREATE_FD_STYLES.sectionTitleCText}>Upload PAN/AADHAAR ID</Text>
+                    <Text style={CREATE_FD_STYLES.sectionTitleCText}>Upload PAN (jpg, png, pdf)</Text>
                     {getFieldsValue('pan_image') ? (
                         <Button 
                             onPress={() => pickImage('pan_image')}

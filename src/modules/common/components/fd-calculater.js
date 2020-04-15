@@ -313,7 +313,7 @@ class FDCalculater extends React.Component {
 
                 <View style={styles.formR}>
                     <View style={styles.formRL}>
-                        <Text style={styles.formRLT}>Period</Text>
+                        <Text style={styles.formRLT}>Period (Months)</Text>
                     </View>
                     <View style={styles.formRF}>
                         <RadioBtnGroup 

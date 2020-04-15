@@ -7,6 +7,7 @@ import utils from '../../services/utils';
 import CheckBox from '../common/components/checkbox';
 import ListItemPanel from '../common/components/list-item-panel';
 import SuccessPayment from '../app/fd-calc/success-payment';
+import { TouchableOpacity } from 'react-native-gesture-handler';
 
 const PaymentSection = ({
     onPreviousStep,
@@ -26,6 +27,7 @@ const PaymentSection = ({
     finishCreateFD,
     txnDetails,
     transactionStatus,
+    goToTerms,
 }) => {
     const [otp, setOtp] = useState('');
     return (
@@ -87,14 +89,20 @@ const PaymentSection = ({
                         <CheckBox checked={accept} onChange={onAcceptChange}/>
                         <Text style={styles.acRText}>Accept all terms and conditions of the scheme's, before you, continue to pay</Text>
                     </View>
+                    <View style={styles.acR}>
+                        <View style={{width: 24}}/>
+                        <TouchableOpacity style={{flexGrow: 1}} onPress={goToTerms}>
+                            <Text style={styles.acRTextBlue}>Terms and Conditions</Text>
+                        </TouchableOpacity>
+                    </View>
                     <Text>Payment Type</Text>
                     <View style={styles.acR}>
                         <CheckBox checked={paymentType === 'net'} onChange={() => onPaymentTypeChange('net')}/>
                         <Text style={styles.acRText}>Net Banking / UPI / Debit Card</Text>
                     </View>
                     <View style={[styles.acR, styles.acRCenter, {marginTop: -5}]}>
-                        <CheckBox  disabled={true} checked={paymentType === 'rtgs'} onChange={() => onPaymentTypeChange('rtgs')}/>
-                        <Text style={[styles.acRText, {opacity: 0.5}]}>RTGS / NEFT</Text>
+                        <CheckBox checked={paymentType === 'rtgs'} onChange={() => onPaymentTypeChange('rtgs')}/>
+                        <Text style={[styles.acRText]}>RTGS / NEFT</Text>
                     </View>
                 </View>
             )}
@@ -142,6 +150,11 @@ const styles = StyleSheet.create({
         marginLeft: 11,
         fontSize: 13,
         fontWeight: '500'
+    },
+    acRTextBlue: {
+        fontSize: 13,
+        color: THEME.PRIMARY,
+        fontWeight: '700',
     },
     verifiedC: {
         flexDirection: 'row',

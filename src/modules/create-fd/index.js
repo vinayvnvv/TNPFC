@@ -40,10 +40,11 @@ class CreateFD extends React.Component {
         authToken: null,
         createdUserData: null,
         accept: false,
-        paymentType: '',
+        paymentType: 'net',
         paymentStatus: null,
         txnDetails: null,
         transactionStatus: null,
+        panStatusCode: null,
     }
     scroll;
     async componentDidMount() {
@@ -206,8 +207,9 @@ class CreateFD extends React.Component {
             console.log('res--->', res.data);
             const {data} = res;
             this.setState({
+                panStatusCode: data.responseCode,
                 panStatus: 
-                    data.responseCode === 1 ? 
+                    data.responseCode === 1 || data.responseCode === 2 ? 
                     true : 
                     data.response ? data.response : 'Verification failed, enter valid PAN number. This may problem with the mismatching of PAN with your basic details that you have filled.',
             }, () => {
@@ -248,7 +250,9 @@ class CreateFD extends React.Component {
                 personalInfo,
                 addressInfo: {permanent, other, same},
                 nomineeInfo: {nominee, is_guardian, guardian},
-            }
+            },
+            panStatusCode,
+            paymentType,
         } = this.state;
         const {productDetails} = this.props;
         const productId = productDetails && productDetails.filter(
@@ -261,6 +265,7 @@ class CreateFD extends React.Component {
             perDistrict: permanent.district,
             perCity: permanent.city,
             perpinCode: permanent.pincode,
+            addressProofType: permanent.addressProofType,
         };
         if(!same && other) {
             address = {
@@ -301,7 +306,7 @@ class CreateFD extends React.Component {
             maturityAmount: parseInt(fdCalc.maturityAmount).toFixed(2),
             title: personalInfo.gender === 'MALE' ? 'MR' : 'MRS',
             fName: personalInfo.first_name,
-            lName: personalInfo.last_name,
+            // lName: personalInfo.last_name,
             dob: moment(personalInfo.dob).format('DD-MMM-YYYY'),
             gender: personalInfo.gender,
             phoneNumber: personalInfo.mobile,
@@ -317,6 +322,10 @@ class CreateFD extends React.Component {
             addProofurl: 'url',
             ...gurdianData,
             ...address,
+            verifiedPAN: panStatusCode === 1 ? 'Y' : 'N',
+            verifiedAADHAAR: 'Y',
+            paymentType: paymentType === 'net' ? 'NETBANKING' : 'RTGS',
+
         };
         return data;
         
@@ -328,9 +337,11 @@ class CreateFD extends React.Component {
 
     onPaymentComplete = () => {
         this.setState({paymentStatus: 'init'});
+        const {navigation}  = this.props;
         console.log('onPaymentComplete', this.state.createdUserData);
         this.setState({transactionStatus: null});
-        const {transactionId, merchantId} = this.state.createdUserData;
+        const {transactionId, merchantId, beneficiaryAccountNumber} = this.state.createdUserData;
+        const paymentType = this.state.paymentType === 'net' ? 'NETBANKING' : 'RTGS';
         apiServices.getTxnDetails(merchantId, transactionId).then(_res => {
             console.log('getTxnDetails', _res.data);
             const d = _res.data;
@@ -340,17 +351,23 @@ class CreateFD extends React.Component {
             console.log('transactionStatus', transactionStatus);
             this.setState({transactionStatus, txnDetails: transactionStatus ? 'loading': null});
             if(transactionStatus === true) {
-                apiServices.paymentSucess(transactionId, this.state.authToken).then(res => {
+                apiServices.paymentSucess(transactionId || beneficiaryAccountNumber, this.state.authToken, paymentType).then(res => {
                     console.log('apiServices');
                     const {data} = res;
+                    if(this.state.paymentType !== 'net') {
+                        navigation.navigate(NAVIGATION.RTGS_SCREEN, {
+                            paymentInfo: data,
+                        });
+                    }
                     console.log(data, data.response, data.response[0]);
                     if(data.responseCode === '200') {
                         console.log('success 200')
                         this.setState({txnDetails: data.response[0]});
-                    } else {
-                        console.log('success not 200', res.data.responseCode, res.data);
-                        this.setState({txnDetails: 'failed'});
-                    }
+                    } 
+                    // else {
+                    //     console.log('success not 200', res.data.responseCode, res.data);
+                    //     this.setState({txnDetails: 'failed'});
+                    // }
                 }).catch(err => {
                     console.log('catch', err);
                     this.setState({txnDetails: 'failed'});
@@ -377,11 +394,16 @@ class CreateFD extends React.Component {
                 }, () => {
                     const html = utils.getPaymentHTML(data);
                     this.setState({paymentStatus: 'loading'});
-                    navigation.navigate(NAVIGATION.PAYMENT_PAGE, {
-                        html,
-                        onPaymentComplete: this.onPaymentComplete,
-                        onCancel: this.onCancel,
-                    });
+                    if(this.state.paymentType === 'net') {
+                        navigation.navigate(NAVIGATION.PAYMENT_PAGE, {
+                            html,
+                            onPaymentComplete: this.onPaymentComplete,
+                            onCancel: this.onCancel,
+                        });
+                    } else {
+                        this.onPaymentComplete();
+                    }
+                    
                 });
             }).catch(err => {
                 console.log(err, err.data);
@@ -407,6 +429,10 @@ class CreateFD extends React.Component {
             transactionStatus: null,
         })
     }
+    goToTerms = () => {
+        const {navigation} = this.props;
+        navigation.navigate(NAVIGATION.TERMS);
+    }
     renderStepContainer = () => {
         const {
             currentStep,
@@ -426,7 +452,14 @@ class CreateFD extends React.Component {
             txnDetails,
             createdUserData,
         } = this.state;
-        const {productDetails, states, districts, relationships, residentList} = this.props;
+        const {
+            productDetails, 
+            states, 
+            districts, 
+            relationships, 
+            residentList, 
+            addressProofDocs
+        } = this.props;
         switch(currentStep) {
             case 0:
                 return <FDCalc 
@@ -448,6 +481,7 @@ class CreateFD extends React.Component {
                         states={states}
                         data={addressInfo}
                         districts={districts}
+                        addressProofDocs={addressProofDocs}
                         onSubmit={this.onAddressFormSubmit}
                         onPreviousStep={this.onPreviousStep} />
             case 3:
@@ -468,6 +502,7 @@ class CreateFD extends React.Component {
                         onRePayment={this.onRePayment}
                         finishCreateFD={this.finishCreateFD}
                         fdCalc={fdCalc}
+                        goToTerms={this.goToTerms}
                         paymentStatus={paymentStatus}
                         personalInfo={personalInfo}
                         onAcceptChange={this.onAcceptChange}
@@ -573,6 +608,7 @@ const mapStateToProps = state => ({
     districts: state.commonReducer.districts,
     relationships: state.commonReducer.relationships,
     residentList: state.commonReducer.residentList,
+    addressProofDocs: state.commonReducer.addressProofDocs,
 })
 export default connect(
     mapStateToProps,
