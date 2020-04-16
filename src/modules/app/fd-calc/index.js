@@ -19,7 +19,7 @@ import { NAVIGATION } from '../../../navigation';
 import SuccessPayment from './success-payment';
 import PersonalInfo from '../deposite/personal-info';
 import { fetchFDSummary } from '../../../store/actions/deposite-actions';
-import FDCalculater, { getFdCalcInitValues } from '../../common/components/fd-calculater';
+import FDCalculater, { getFdCalcInitValues, getInterestPayment } from '../../common/components/fd-calculater';
 
 class FDCalc extends React.Component {
     state = {
@@ -36,6 +36,7 @@ class FDCalc extends React.Component {
         txnDetails: null,
         transactionStatus: null,
         initStep3Status: false,
+        ROI: null,
     }
     pgPayloadData;
     goBack = () => {
@@ -57,11 +58,13 @@ class FDCalc extends React.Component {
         this.setState({[f]: v});
     }
     isFormValid = () => {
+        
         const {formErr, acceptTerms} = this.state;
+        console.log(!formErr && acceptTerms);
         return !formErr && acceptTerms;
     }
     onPaymentClick = () => {
-        if(!this.selectedProduct) return;
+        // if(!this.selectedProduct) return;
         this.setState({
             currentStep: 0,
         });
@@ -70,35 +73,42 @@ class FDCalc extends React.Component {
                 interest,
                 amount,
                 period,
+                scheme,
+                isSenior,
             },
+            ROI,
             maturityAmount,
         } = this.state;
-        const {navigation} = this.props;
-        let ROI = 0;
-        let interestPayment = 0;
-        if (interest === 'month') {
-            ROI = this.selectedProduct.monthlyIntRate;
-            interestPayment = 30;
-        } else if (interest === 'quarter') {
-            ROI = this.selectedProduct.quarterlyIntRate;
-            interestPayment = 90;
-        } else if (interest === 'annual') {
-            ROI = this.selectedProduct.yearlyIntRate;
-            interestPayment = 360;
-        } else if (interest === 'maturity') {
-            ROI = this.selectedProduct && this.selectedProduct["onMaturityRate "] ? 
-                        this.selectedProduct["onMaturityRate "] : 0;
-            interestPayment = 0;
-        }
-        let channel = 'web';
+        const {navigation, productDetails} = this.props;
+        // let ROI = 0;
+        // let interestPayment = 0;
+        // if (interest === 'month') {
+        //     ROI = this.selectedProduct.monthlyIntRate;
+        //     interestPayment = 30;
+        // } else if (interest === 'quarter') {
+        //     ROI = this.selectedProduct.quarterlyIntRate;
+        //     interestPayment = 90;
+        // } else if (interest === 'annual') {
+        //     ROI = this.selectedProduct.yearlyIntRate;
+        //     interestPayment = 360;
+        // } else if (interest === 'maturity') {
+        //     ROI = this.selectedProduct && this.selectedProduct["onMaturityRate "] ? 
+        //                 this.selectedProduct["onMaturityRate "] : 0;
+        //     interestPayment = 0;
+        // }
+        // let channel = 'web';
+        const productId = productDetails && productDetails.filter(
+            i=>String(i.productAliasName).toLowerCase().includes(scheme)
+        );
         const data = {
             depositAmount: parseInt(amount).toFixed(2),
-            productId: this.selectedProduct.productId,
-            categoryId: this.selectedProduct.categoryId,
+            productId: productId && productId[0].productId,
+            categoryId: isSenior ? 'GENERAL_CATEGORY' : 'SENIOR_CITIZENS',
             period,
-            interestPayment,
+            interestPayment: getInterestPayment(interest),
             rateOfInterest: ROI,
             maturityAmount,
+            paymentType: 'NETBANKING',
         };
         apiServices.getPGPayload(data).then(res => {
             console.log(res);
@@ -159,11 +169,11 @@ class FDCalc extends React.Component {
             console.log('transactionStatus', transactionStatus);
             this.setState({transactionStatus, txnDetails: transactionStatus ? 'loading': null});
             if(transactionStatus === true) {
-                apiServices.paymentSucess(transactionId).then(res => {
+                apiServices.paymentSucess(transactionId, null, 'NETBANKING').then(res => {
                     console.log('apiServices');
                     const {data} = res;
                     console.log(data, data.response, data.response[0]);
-                    if(data.responseCode === '200') {
+                    if(data.response) {
                         console.log('success 200')
                         this.setState({txnDetails: data.response[0]});
                     } else {
@@ -208,7 +218,7 @@ class FDCalc extends React.Component {
         navigation.navigate(NAVIGATION.FD_DETAILS, {selectedDeposite: fdSummary[0]});
     }
 
-    onCalcValueChange = (form, maturityAmount, formErr, maturityDate) => {
+    onCalcValueChange = (form, maturityAmount, formErr, maturityDate, ROI) => {
         console.log('onChange');
         console.log(form);
         this.setState({
@@ -216,6 +226,7 @@ class FDCalc extends React.Component {
             maturityAmount,
             formErr,
             maturityDate,
+            ROI,
         })
     }
     render() {
