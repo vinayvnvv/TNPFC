@@ -117,5 +117,8 @@ class APIService {
     getAddressProofDocList() {
         return axios.post(HOST + 'getAddressProofDocList', {}, this.getConfig());
     }
+    createServiceRequest(data) {
+        return axios.post(HOST + 'createServiceRequest', data, this.getConfig());
+    }
 }
 export default new APIService();

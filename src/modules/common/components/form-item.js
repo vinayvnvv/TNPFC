@@ -11,6 +11,8 @@ const FormItem = ({
     errText,
     onFocusOut,
     disabled,
+    style ={},
+    isVertical,
 }) => {
     const [isFocus, setFocus] = useState(false);
     const inputProps = {
@@ -28,6 +30,7 @@ const FormItem = ({
         }
     }
     return (
+        !isVertical ? 
         <>
             <View 
                 pointerEvents={disabled ? 'none' : 'auto'}
@@ -53,6 +56,25 @@ const FormItem = ({
                     <Text style={styles.errText}>{errText}</Text>
                 </View>
             )}
+        </>
+        : 
+        <>
+            <View style={[styles.formItemVertical, style]}>
+                <Text style={[styles.labelText, styles.formItemVerticalLabelText]}>{label}</Text>
+                <View style={[
+                    styles.formField,
+                    isFocus ? styles.formItemFocus : {},
+                    isErr ? styles.formErr : {}, 
+                    disabled ? styles.formItemDisabled : {},
+                    ]}>
+                    {React.cloneElement(input, {...inputProps})}
+                </View>
+                {isErr && errText && (
+                    <View style={[styles.errC, styles.formItemVerticalErrC]}>
+                        <Text style={styles.errText}>{errText}</Text>
+                    </View>
+                )}
+            </View>
         </>
     );
 }
@@ -119,6 +141,28 @@ const styles = StyleSheet.create({
     errText: {
         color: THEME.DANGER,
         fontSize: 13,
+    },
+    formItemVertical: {
+        marginBottom: 25,
+        position: 'relative',
+    },
+    formField: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        minHeight: inputMinHeight - 10,
+        borderColor: '#d9d9d9',
+        borderStyle: 'solid',
+        borderWidth: 1,
+        paddingHorizontal: 17,
+    },
+    formItemVerticalLabelText: {
+        marginBottom: 3,
+        color: '#666'
+    },
+    formItemVerticalErrC: {
+        position: 'absolute',
+        top: '100%',
+        marginTop: 0,
     }
 });
 

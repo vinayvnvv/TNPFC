@@ -22,5 +22,18 @@ export const COMMON_STYLES = StyleSheet.create({
     },
     textPrimary: {
         color: THEME.PRIMARY,
+    },
+    modalContainer: {
+        flex: 1,
+        width: '100%',
+        height: '100%',
+        position: 'absolute',
+        top: 0,
+        left: 0,
+        zIndex: 999,
+    },
+    modalContent: {
+        backgroundColor: '#fff',
+        borderRadius: 3,
     }
 })

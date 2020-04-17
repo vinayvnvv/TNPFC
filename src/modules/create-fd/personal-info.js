@@ -137,8 +137,8 @@ const PersonalInfo = ({
                 <View style={CREATE_FD_STYLES.sectionContent}>
                     {createField('first_name', {
                         trigger: TEXT_INPUT_TRIGGER,
-                        // initialValue: 'VIJAYKUMAR KUNNATH',
-                        initialValue: data && data.first_name,
+                        initialValue: 'VIJAYKUMAR KUNNATH',
+                        // initialValue: data && data.first_name,
                         rules: [
                             {required: true, message: 'Name is required.'},
                             {pattern: REGEX.NAME_WITH_SPACE.PATTERN, message: REGEX.NAME_WITH_SPACE.MESSAGE('Name')}
@@ -217,8 +217,8 @@ const PersonalInfo = ({
 
                     {createField('mobile', {
                         trigger: TEXT_INPUT_TRIGGER,
-                        initialValue: data && data.mobile,
-                        // initialValue: '7045843647',
+                        // initialValue: data && data.mobile,
+                        initialValue: '7045843647',
                         localData: {
                             label: 'Mobile Number',
                         },
@@ -248,8 +248,8 @@ const PersonalInfo = ({
                 <View style={CREATE_FD_STYLES.sectionContent}>
                     {createField('aadhaar', {
                         trigger: TEXT_INPUT_TRIGGER,
-                        // initialValue: '830910399777',
-                        initialValue: data && data.aadhaar,
+                        initialValue: '830910399777',
+                        // initialValue: data && data.aadhaar,
                         localData: {
                             label: 'Aadhaar No',
                             onFocusOut: () => {
@@ -273,8 +273,8 @@ const PersonalInfo = ({
 
                     {createField('pan', {
                         trigger: TEXT_INPUT_TRIGGER,
-                        // initialValue: 'ARRPK7194H',
-                        initialValue: data && data.pan,
+                        initialValue: 'ARRPK7194H',
+                        // initialValue: data && data.pan,
                         localData: {
                             label: 'PAN No',
                             onFocusOut: () => {

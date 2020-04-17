@@ -17,7 +17,7 @@ import NomineeInfo from './nominee-info';
 import PaymentSection from './payment-section';
 import { getInterestPayment } from '../common/components/fd-calculater';
 import { NAVIGATION } from '../../navigation';
-const DEBUG = false;
+const DEBUG = true;
 const steps = [
     {label: 'Select Plan'}, {label: 'Personal Information'}, {label: 'Address Information'}, 
     {label: 'Nominee Details'}, {label: 'Payment'},

@@ -26,9 +26,12 @@ function createForm(formOptions = {}) {
                 }
             }
             addField = (name, options) => {
+                console.log('addField', name, options);
                 this.formValues[name] = options && options.initialValue ? options.initialValue : '';
                 if(options && options.rules) this.rules[name] = options.rules;
                 if(options && options.localData) this.localData[name] = options.localData;
+
+                this.forceUpdate();
             }
             onFormChange = (field, options, e) => {
                 const valueProp = this.parseValueProp(options, 'get');
@@ -136,6 +139,25 @@ function createForm(formOptions = {}) {
                 });
             }
 
+            clearFields = fields => {
+                console.log('clearFields', fields);
+                let formValues = {...this.formValues};
+                fields && fields.length > 0 && fields.forEach(f => {
+                    if([f] in formValues) delete formValues[f];
+                    if([f] in this.rules) delete this.rules[f];
+                    if([f] in this.localData) delete this.localData[f];
+                    if([f] in this.errors) delete this.errors[f];
+                    if([f] in this.fieldTouched) delete this.fieldTouched[f];
+                    if([f] in this.formValues) delete this.formValues[f];
+                });
+                console.log('this.clearFields', formValues);
+                if(fields && fields.length > 0) {
+                    this.formValues = {...formValues};
+                    this.forceUpdate();
+                    console.log('updated', this.formValues);
+                }
+            }
+
             setFieldValue = (field, v) => {
                 if(this.formValues.hasOwnProperty(field)) {
                     this.formValues[field] = v;
@@ -156,6 +178,7 @@ function createForm(formOptions = {}) {
                         errors: this.errors,
                         setFieldValue: this.setFieldValue,
                         getErrors: this.getErrors,
+                        clearFields: this.clearFields,
                     }
             }
             render() {
