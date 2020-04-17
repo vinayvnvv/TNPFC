@@ -115,7 +115,7 @@ class Index extends React.Component {
                         </>
                     ) : (
                         <>
-                            {/* <Stack.Screen
+                            <Stack.Screen
                                 name={NAVIGATION.DASHBOARD}
                                 component={DashBoard} />
                             <Stack.Screen
@@ -150,7 +150,7 @@ class Index extends React.Component {
                                     headerLeft: null,
                                 }}
                                 name={NAVIGATION.PAYMENT_PAGE}
-                                component={PaymentView} /> */}
+                                component={PaymentView} />
                             <Stack.Screen
                                 name={NAVIGATION.ADD_SERVICE}
                                 component={AddService} />
