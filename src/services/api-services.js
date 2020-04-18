@@ -120,5 +120,11 @@ class APIService {
     createServiceRequest(data) {
         return axios.post(HOST + 'createServiceRequest', data, this.getConfig());
     }
+    getCountriesList() {
+        return axios.post(HOST + 'countries', {}, this.getConfig());
+    }
+    getBankDetails(ifscCode) {
+        return axios.post(HOST + 'getBankDetails', {ifscCode}, this.getConfig());
+    }
 }
 export default new APIService();

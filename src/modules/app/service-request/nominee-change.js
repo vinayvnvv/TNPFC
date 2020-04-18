@@ -1,6 +1,6 @@
 import React, {useState} from 'react';
-import { Text, View, Spinner, Button, DatePicker, Picker } from 'native-base';
-import { ScrollView, TextInput } from 'react-native-gesture-handler';
+import { Text, View, Spinner, Button, DatePicker, Picker, Toast } from 'native-base';
+import { TextInput } from 'react-native-gesture-handler';
 import SelectAccount from './select-account';
 import Steps from '../../common/components/steps';
 import ListItemPanel from '../../common/components/list-item-panel';
@@ -8,10 +8,11 @@ import apiServices from '../../../services/api-services';
 import utils from '../../../services/utils';
 import FormItem from '../../common/components/form-item';
 import { createForm } from '../../../lib/form';
-import { StyleSheet, Platform } from 'react-native';
+import { StyleSheet, Platform, Alert } from 'react-native';
 import { REGEX } from '../../../constants';
 import moment from 'moment';
 import { SERV_REQ_STYLES } from './service-req-styles';
+import OTPVerify from './otp-verify';
 const TEXT_INPUT_TRIGGER = Platform.OS === 'web' ? 'onChange' : 'onChangeText';
 
 const steps = [
@@ -21,7 +22,11 @@ const steps = [
 
 const NomineeForm = ({
     depositeList,
-    userDetails,
+    navigation,
+    userDetails: {
+        panNumber,
+        customerId,
+    } = {},
     relationships,
     form: {
         createField, 
@@ -31,7 +36,9 @@ const NomineeForm = ({
         clearFields,
     },
 }) => {
-    const [currentStep, setStep] = useState(1);
+    const [showOTP, setShowOtp] = useState(false);
+    const [loading, setLoading] = useState(false);
+    const [currentStep, setStep] = useState(0);
     const [selectedAcc, setSelectedAcc] = useState(null);
     const [listPanelData, setListPanelData] = useState([]);
     const [loadingSummary, setLoadingSummary] = useState(false);
@@ -73,8 +80,68 @@ const NomineeForm = ({
     const onSubmit = () => {
         validateForm((err, values) => {
             console.log(err, values);
+            if(!err) {
+                setShowOtp(true);
+            }
         });
     }
+
+    const onVerify = () => {
+        setShowOtp(false);
+        setLoading(true);
+        const values = getFieldsValue();
+
+        let data = {
+            "serviceType":"nomineeChange",
+            "depositNumber": values.depositNumber,
+            "customerId": customerId,
+            "nomineeName": values.nomineeName,
+            "relationship": values.relationship,
+            "nomineeDob": moment(values.nomineeDob).format('DD-MMM-YYYY'),
+            "nomineeStatus": "0",
+        };
+        if(isGuardian) {
+            data["guardianName"] = values.guardianName,
+            data["guardianRelationship"] = values.guardianRelationship,
+            data["nomineeStatus"] = "0"
+        }
+        console.log(data);
+        apiServices.createServiceRequest(data).then(res => {
+            const {data} = res;
+            if(data.responseCode === '200') {
+                Alert.alert(
+                    'ACK ID: ' + data.response.ACK_ID,
+                    'Service request created successfully!',
+                    [
+                      {text: 'OK', onPress: () => navigation.goBack()},
+                    ],
+                    { cancelable: false }
+                  );
+                  if(Platform.OS === 'web') {
+                      alert('succes - ' + data.response.ACK_ID);
+                      navigation.goBack();
+                  }
+            } else {
+                Alert.alert(
+                    'Failed',
+                    data.response,
+                    [
+                      {text: 'OK', onPress: () => navigation.goBack()},
+                    ],
+                    { cancelable: false }
+                  );
+                if(Platform.OS === 'web') {
+                    alert('failed - ' + data.response);
+                    navigation.goBack();
+                }
+            }
+            setLoading(false);
+        }).catch(err => {
+            Toast.show({text: 'Err in newtwork', type: 'danger'});
+            setLoading(false);
+        })
+    }
+    
     return (
         <>
             <Steps steps={steps} currentStep={currentStep}/>
@@ -104,7 +171,7 @@ const NomineeForm = ({
                 <View style={styles.formC}>
                     {createField('depositNumber', {
                         trigger: TEXT_INPUT_TRIGGER,   
-                        initialValue: 'sdf',
+                        initialValue: selectedAcc,
                         localData: {
                             label: 'Selected Account',
                             disabled: true,
@@ -195,9 +262,13 @@ const NomineeForm = ({
                         </>
                     )}
 
-                    <Button block onPress={onSubmit}>
-                        <Text>Authenticate Your Request</Text>
-                    </Button>
+                    {showOTP && <OTPVerify panNumber={panNumber} onVerify={onVerify}/>}
+                    {loading && <Spinner />}
+                    {!showOTP && !loading  && (
+                        <Button block onPress={onSubmit}>
+                            <Text>Authenticate Your Request</Text>
+                        </Button>
+                    )}
                 </View>
             )}
         </>

@@ -14,8 +14,8 @@ import { TouchableOpacity } from 'react-native-gesture-handler';
 const servicesTypes = [
     {name: 'TAX Form 15G/15H', icon: 'add', param: {type: 'tax'}},
     {name: 'Nominee Change', icon: 'add', param: {type: 'nominee'}},
-    {name: 'Bank Account', icon: 'add', param: {type: 'bank_account'}},
-    {name: 'Address', icon: 'add', param: {type: 'address'}},
+    {name: 'Bank Account Change', icon: 'add', param: {type: 'bank_account'}},
+    {name: 'Address Change', icon: 'add', param: {type: 'address'}},
 ];
 
 const SelectModal = ({
@@ -83,14 +83,25 @@ class ServiceRequest extends React.Component {
     state = {
         pageInit: false,
         typeModal: false,
+        loading: false,
     }
     componentDidMount() {
         this.initPage();
+        this.willFocusSubscription = this.props.navigation.addListener(
+            'focus',
+            () => {
+              this.initPage();
+            }
+        );
+    }
+    componentWillUnmount() {
+        if(this.willFocusSubscription && 'remove' in this.willFocusSubscription) this.willFocusSubscription.remove();
     }
     initPage = async () => {
-        const {requestStatus, fetchRequestStatus} = this.props;
-        if(!requestStatus) await fetchRequestStatus();
-        this.setState({pageInit: true});
+        const {fetchRequestStatus} = this.props;
+        this.setState({loading: true});
+        await fetchRequestStatus();
+        this.setState({pageInit: true, loading: false});
     }
     goBack = () => {
         const {navigation} = this.props;
@@ -102,12 +113,13 @@ class ServiceRequest extends React.Component {
     onSelectType = t => {
         const {navigation} = this.props;
         navigation.navigate(NAVIGATION.ADD_SERVICE, t.param);
+        this.toggleTypeModal();
     }
     render() {
-        const {requestStatus} = this.props;
-        const {pageInit, typeModal} = this.state;
+        const {requestStatus = []} = this.props;
+        const {pageInit, typeModal, loading} = this.state;
         return (
-            pageInit ? (
+            pageInit && !loading ? (
                 <Container>
                     <SelectModal 
                         visible={typeModal} 
@@ -125,7 +137,7 @@ class ServiceRequest extends React.Component {
                         <Right />
                     </Header>
                     <Container style={styles.container}>
-                        {requestStatus && requestStatus.length !== undefined  && requestStatus.length > 0 && (
+                        {requestStatus && requestStatus.length !== undefined  && (
                             <FlatList
                                 data={requestStatus}
                                 ListHeaderComponent={<ListHeader onAdd={this.toggleTypeModal}/>}

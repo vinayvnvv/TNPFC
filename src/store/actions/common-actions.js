@@ -175,6 +175,20 @@ export const getResidentList = () => {
     }
 }
 
+export const getCountriesList = () => {
+    return (dispatch) => {
+        apiServices.getCountriesList().then(res => {
+            const {data} = res;
+            if(data) {
+                dispatch({
+                    type: COMMON.ON_FETCH_COUNTRIES,
+                    payload: data.response,
+                });
+            }
+        })
+    }
+}
+
 export const getAddressProofDocList = () => {
     return (dispatch) => {
         apiServices.getAddressProofDocList().then(res => {

@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "441538063854",
+    "firebase_url": "https://tnpf-mobile-app.firebaseio.com",
+    "project_id": "tnpf-mobile-app",
+    "storage_bucket": "tnpf-mobile-app.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:441538063854:android:c5c763234e5fa34a0e72ff",
+        "android_client_info": {
+          "package_name": "com.tnpowerfinance.mobileapp"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "441538063854-dgvlf3f8akeq04pqq1nc2526427ec1j2.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDVW3DtE4NLXEAx2RMMV3soL6wn1zAi5do"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "441538063854-dgvlf3f8akeq04pqq1nc2526427ec1j2.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

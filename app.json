@@ -30,7 +30,8 @@
     },
     "android": {
       "package": "com.tnpfc.mobile",
-      "versionCode": 1
+      "versionCode": 1,
+      "googleServicesFile": "./assets/google-services.json"
     },
     "ios": {
       "bundleIdentifier": "com.tnpfc.mobile",

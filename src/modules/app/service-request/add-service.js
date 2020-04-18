@@ -9,11 +9,13 @@ import { fetchAllDeposites } from '../../../store/actions/deposite-actions';
 import { COMMON_STYLES } from '../../common/styles';
 import NomineeForm from './nominee-change';
 import { ScrollView } from 'react-native-gesture-handler';
+import AddressChange from './address-change';
+import BankAccChange from './bank-acc-change';
 
 class AddService extends React.Component {
     state = {
         pageTitle: 'Service Request',
-        currentForm: 'nominee',
+        currentForm: 'address',
         init: false,
     };
     goBack = () => {
@@ -25,12 +27,16 @@ class AddService extends React.Component {
             userDetails, 
             fetchCustomerDetails, 
             fetchAllDeposites, 
-            depositeList
+            depositeList,
+            route: {
+                params: {type}
+            }
         } = this.props;
         if(!userDetails) await fetchCustomerDetails();
         if(!depositeList) await fetchAllDeposites();
-        this.init();
-        this.setState({init: true});
+        this.setState({currentForm: type}, () => {
+            this.init();
+        });
     }
     init = () => {
         const {currentForm} = this.state;
@@ -38,9 +44,20 @@ class AddService extends React.Component {
         switch(currentForm) {
             case 'tax':
                 pageTitle = 'Tax Form 15G/15H';
+                break;
+            case 'nominee':
+                pageTitle = 'Nominee Change';
+                break;
+            case 'address':
+                pageTitle = 'Address Change';
+                break;
+            case 'bank_account':
+                pageTitle = 'Bank Account Change';
+                break;
         }
         this.setState({
             pageTitle,
+            init: true,
         });
     }
 
@@ -52,7 +69,9 @@ class AddService extends React.Component {
             navigation, 
             states, 
             relationships, 
-            districts
+            districts,
+            countries,
+            residentList,
         } = this.props;
         switch(currentForm) {
             case 'tax':
@@ -62,6 +81,20 @@ class AddService extends React.Component {
                             userDetails={userDetails} />;
             case 'nominee': 
                 return <NomineeForm 
+                            navigation={navigation}
+                            relationships={relationships}
+                            depositeList={depositeList}
+                            userDetails={userDetails} />
+            case 'address': 
+                return <AddressChange 
+                            navigation={navigation}
+                            residentList={residentList}
+                            states={states}
+                            countries={countries}
+                            districts={districts}
+                            userDetails={userDetails} />
+            case 'bank_account': 
+                return <BankAccChange 
                             navigation={navigation}
                             relationships={relationships}
                             depositeList={depositeList}
@@ -119,8 +152,10 @@ const mapStateToProps = state => ({
     userDetails: state.commonReducer.userDetails,
     depositeList: state.depositeReducer.depositeList,
     states: state.commonReducer.states,
+    countries: state.commonReducer.countries,
     districts: state.commonReducer.districts,
     relationships: state.commonReducer.relationships,
+    residentList: state.commonReducer.residentList,
 });
 
 export default connect(

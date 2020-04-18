@@ -31,6 +31,12 @@ export const CONSTANTS = {
                 return `${field} is invalid.`
             },
         },
+        IFSC: {
+            PATTERN: /^[A-Za-z]{4}\d{7}$/,
+            MESSAGE: () => {
+                return 'IFSC Code is invalid';
+            },
+        }
     }
 }
 

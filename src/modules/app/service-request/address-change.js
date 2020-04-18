@@ -11,36 +11,32 @@ import apiServices from '../../../services/api-services';
 import utils from '../../../services/utils';
 const TEXT_INPUT_TRIGGER = Platform.OS === 'web' ? 'onChange' : 'onChangeText';
 
-const TaxForm = ({
+const AddressChange = ({
     depositeList,
     navigation,
     userDetails: {
         panNumber,
-        dob,
         customerId,
     } = {},
     form: {
         createField, getFieldsValue, setFieldValue, validateForm,
-        getErrors,
     },
+    residentList,
+    states,
+    districts,
+    countries,
 }) => {
     const [showOTP, setShowOtp] = useState(false);
     const [loading, setLoading] = useState(false);
-    const onChangeAccountNumber = v => {
-        console.log('onChangeAccountNumber', v);
-        const d = depositeList.filter(i=>i.accountNumber === v);
-        if(d[0]) {
-            setFieldValue('estimateInterest', String(d[0].annualInterest).toString());
-        }
-    }
     const onVerify = () => {
         setShowOtp(false);
         setLoading(true);
         const values = getFieldsValue();
         const data = {
             ...values,
-            "serviceType": "form15gSubmission",
+            "serviceType":"addressChange",
             "customerId": customerId,
+            "addressType": "COMM_ADDR",
         }
         console.log(data);
         apiServices.createServiceRequest(data).then(res => {
@@ -87,103 +83,134 @@ const TaxForm = ({
     }
      return (
         <>
-            {createField('depositNumber', {
+            {createField('residentialStatus', {
                 trigger: 'onValueChange',
                 valueProp: '=selectedValue',
-                initialValue: depositeList && depositeList[0] && depositeList[0].accountNumber,
+                initialValue: residentList && residentList[2] && residentList[2].residentCode,
                 rules: [
-                    {required: true, message: 'Account Number is required.'},
+                    {required: true, message: 'Residential Status is required.'},
                 ],
-                onValueChange: onChangeAccountNumber,
                 localData: {
-                    label: 'Account Number',
+                    label: 'Residential Status',
                 }
-            })(<Picker mode={'dropdown'}>
-                {depositeList && depositeList.map((d, idx) =>
+            })(<Picker>
+                {residentList && residentList.map((d, idx) =>
                     <Picker.Item 
-                        key={d.accountNumber + '-' + idx}
-                        value={d.accountNumber} 
-                        label={d.accountNumber} />
+                        key={d.residentCode + '-' + idx}
+                        value={d.residentCode} 
+                        label={d.residentName} />
                 )}
             </Picker>)}
-            {createField('panNumber', {
-                trigger: TEXT_INPUT_TRIGGER,
-                initialValue: panNumber,    
-                localData: {
-                    label: 'PAN Number',
-                    disabled: true,
-                }
-            })(<TextInput  editable={false}/>)}
 
-            {createField('dob', {
-                trigger: TEXT_INPUT_TRIGGER,
-                initialValue: dob ? utils.getAppCommonDateFormat(dob) : null,    
-                localData: {
-                    label: 'Date of Birth',
-                    disabled: true,
-                }
-            })(<TextInput placeholder="dd/mm/yyyy" editable={false}/>)}
-            {createField('act', {
-                trigger: TEXT_INPUT_TRIGGER,
-                initialValue: 'y',
-                localData: {
-                    label: 'Whether assesssment to tax under Income tax Act 1961',
-                    disabled: true,
-                }
-            })(<Picker>
-                <Picker.Item value={'y'} label={'Yes'}/>
-            </Picker>)}
-            {createField('assessmentYear', {
-                trigger: TEXT_INPUT_TRIGGER,
-                initialValue: '2019',
+            {createField('countryCode', {
+                trigger: 'onValueChange',
+                valueProp: '=selectedValue',
+                initialValue: countries && countries[0] && countries[0].countryCode,
                 rules: [
-                    {required: true, message: 'Assesssment Year is required.'},
+                    {required: true, message: 'Country is required.'},
                 ],
                 localData: {
-                    label: 'Latest assesssment year which assessed #',
+                    label: 'Country',
                 }
             })(<Picker>
-                <Picker.Item value={'2019'} label={'2019-20'}/>
-                <Picker.Item value={'2020'} label={'2020-21'}/>
+                {countries && countries.map((d, idx) =>
+                    <Picker.Item 
+                        key={d.countryCode + '-' + idx}
+                        value={d.countryCode} 
+                        label={d.countryName} />
+                )}
             </Picker>)}
-            {createField('estimateInterest', {
-                initialValue: depositeList && depositeList[0] && String(depositeList[0].annualInterest).toString(),
-                trigger: TEXT_INPUT_TRIGGER,      
-                localData: {
-                    label: 'Estimated Income earned on deposit(s)',
-                    disabled: true,
-                }
-            })(<TextInput editable={false}/>)}
-            {createField('estimateTotIncome', {
+
+
+            {createField('street', {
                 trigger: TEXT_INPUT_TRIGGER,     
                 rules: [
-                    {required: true, message: 'Income is required.'},
-                    {pattern: REGEX.NUMBER, message: 'Income should be in number.'},
+                    {required: true, message: 'Required.'},
                 ], 
-                localData: {
-                    label: 'Estimated Total Income including the estimated income earned on deposit(s)*',
+                localData: {    
+                    label: 'Door No/ Building/ Street',
                 }
             })(<TextInput />)}
 
-            <Text style={SERV_REQ_STYLES.sectionTtl}>Detail of Form No. 15G/15H other than this form filled during the Current Financial Year #</Text>
-            {createField('formFiled', {
+
+            {createField('area', {
                 trigger: TEXT_INPUT_TRIGGER,     
                 rules: [
-                    {required: true, message: 'No of Forms is required.'},
-                    {pattern: REGEX.NUMBER, message: 'No of Forms should be in number.'},
+                    {required: true, message: 'Required.'},
                 ], 
-                localData: {
-                    label: 'a) No of Forms filed*',
+                localData: {    
+                    label: 'Area / Landmark',
                 }
             })(<TextInput />)}
-            {createField('aggregateAmt', {
+
+
+            {createField('state', {
+                trigger: 'onValueChange',
+                valueProp: '=selectedValue',
+                initialValue: states && states[0] && states[0].stateCode,
+                rules: [
+                    {required: true, message: 'State is required.'},
+                ],
+                localData: {
+                    label: 'State',
+                }
+            })(<Picker>
+                {states && states.map((d, idx) =>
+                    <Picker.Item 
+                        key={d.stateCode + '-' + idx}
+                        value={d.stateCode} 
+                        label={d.stateName} />
+                )}
+            </Picker>)}
+
+            {createField('district', {
+                trigger: 'onValueChange',
+                valueProp: '=selectedValue',
+                initialValue: districts && districts[0] && districts[0].districtCode,
+                rules: [
+                    {required: true, message: 'District is required.'},
+                ],
+                localData: {
+                    label: 'District',
+                }
+            })(<Picker>
+                {districts && districts.map((d, idx) =>
+                    <Picker.Item 
+                        key={d.districtCode + '-' + idx}
+                        value={d.districtCode} 
+                        label={d.districtName} />
+                )}
+            </Picker>)}
+
+            {createField('city', {
                 trigger: TEXT_INPUT_TRIGGER,     
                 rules: [
-                    {required: true, message: 'Aggregate is required.'},
-                    {pattern: REGEX.NUMBER, message: 'Aggregate should be in number.'},
+                    {required: true, message: 'Required.'},
                 ], 
-                localData: {
-                    label: 'b) Aggregate Amount*',
+                localData: {    
+                    label: 'Village/Town/City',
+                }
+            })(<TextInput />)}
+
+            {createField('pinCode', {
+                trigger: TEXT_INPUT_TRIGGER,     
+                rules: [
+                    {required: true, message: 'Pincode is Required.'},
+                    {pattern: REGEX.NUMBER, message: 'Pin code should be in number'},
+                ], 
+                localData: {    
+                    label: 'Pincode',
+                }
+            })(<TextInput />)}
+
+            {createField('emailId', {
+                trigger: TEXT_INPUT_TRIGGER,     
+                rules: [
+                    {required: true, message: 'Email ID is Required.'},
+                    {pattern: REGEX.EMAIL.PATTERN, message: REGEX.EMAIL.MESSAGE()},
+                ], 
+                localData: {    
+                    label: 'Email ID',
                 }
             })(<TextInput />)}
 
@@ -216,4 +243,4 @@ export default createForm({
                 errText={(error) ? error[0].message : null}
                 isErr={(error && (touched || isSubmit)) ? true : false}/>
     }
-})(TaxForm);
+})(AddressChange);

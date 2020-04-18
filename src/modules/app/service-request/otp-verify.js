@@ -10,6 +10,7 @@ const OTPVerify = ({
     onVerify,
 }) => {
     useEffect(() => {
+        console.log('OTPVerify');
         sendOtp();
     }, []);
     const [otp, setOtp] = useState('');
@@ -34,12 +35,14 @@ const OTPVerify = ({
     const verifyOtp = () => {
         setVerifying(true);
         apiServices.verifyOTP(otp, panNumber).then(res => {
+            setVerifying(false);
             const {data} = res;
             if(data.responseCode === '200') {
-                if(onVerify) onVerify()
+                if(onVerify) onVerify();
+                return;
             }
-            setVerifying(false);
         }).catch(err => {
+            console.log(err);
             setVerifying(false);
             Toast.show({text: 'OTP entered in incorrect.', type: 'danger'});
         })

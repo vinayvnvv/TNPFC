@@ -4,7 +4,7 @@ import {NavigationContainer} from '@react-navigation/native';
 import {createStackNavigator} from '@react-navigation/stack';
 import authServices from './services/authServices';
 import {setAuth, removeAuth, loadAuth} from './store/actions/auth-actions';
-import {fetchCustomerDetails, fetchStates, fetchDistricts, fetchRelationshipList, getResidentList, getAddressProofDocList} from './store/actions/common-actions';
+import {fetchCustomerDetails, fetchStates, fetchDistricts, fetchRelationshipList, getResidentList, getAddressProofDocList, getCountriesList} from './store/actions/common-actions';
 import Login from './modules/login/Login';
 import DashBoard from './modules/app/dashboard';
 import { NAVIGATION } from './navigation';
@@ -38,12 +38,14 @@ class Index extends React.Component {
             fetchRelationshipList,
             getResidentList,
             getAddressProofDocList,
+            getCountriesList,
         } = this.props;
         fetchStates();
         fetchDistricts();
         fetchRelationshipList();
         getResidentList();
         getAddressProofDocList();
+        getCountriesList();
     }
 
     initApp = () => {
@@ -115,7 +117,7 @@ class Index extends React.Component {
                         </>
                     ) : (
                         <>
-                            {/* <Stack.Screen
+                            <Stack.Screen
                                 name={NAVIGATION.DASHBOARD}
                                 component={DashBoard} />
                             <Stack.Screen
@@ -150,7 +152,7 @@ class Index extends React.Component {
                                     headerLeft: null,
                                 }}
                                 name={NAVIGATION.PAYMENT_PAGE}
-                                component={PaymentView} /> */}
+                                component={PaymentView} />
                             <Stack.Screen
                                 name={NAVIGATION.ADD_SERVICE}
                                 component={AddService} />
@@ -178,6 +180,7 @@ export default connect(
         fetchRelationshipList,
         getResidentList,
         getAddressProofDocList,
+        getCountriesList,
     }
 )(Index);
 
