@@ -29,7 +29,7 @@ const periodOptions = [
 const interestOptions = [
     {label: 'Monthly', value: 'month'},
     {label: 'Quarterly', value: 'quarter'},
-    {label: 'Annually', value: 'Annual'},
+    {label: 'Annually', value: 'annual'},
     {label: 'On Maturity', value: 'maturity'},
 ];
 
@@ -185,7 +185,7 @@ class FDCalculater extends React.Component {
         } else {
             productName = 'CIPS I'
         }
-        let category = this.state.isSenior ? CATEGORY.SENIOR : CATEGORY.GENERAL;
+        let category = this.state.form.isSenior ? CATEGORY.SENIOR : CATEGORY.GENERAL;
         let period = this.state.form.period;
         let depositAmount = this.state.form.amount;
         let interestPayment = this.state.form.interest;

@@ -3,10 +3,12 @@ import { Container, Header, Button, Icon, Body, Title, Left, Right, View, Text }
 import { NavigationContainer } from '@react-navigation/native';
 import WebView from 'react-native-webview';
 import { NAVIGATION } from '../../navigation';
+import { connect } from 'react-redux';
 
 const RTGSScreen = ({
     navigation,
     route,
+    token,
 }) => {
     const {
         paymentInfo: {
@@ -192,7 +194,12 @@ const RTGSScreen = ({
     </html>`;
 
     const goBack = () => {
-        navigation.navigate(NAVIGATION.LOGIN);
+        if(token) {
+            navigation.navigate(NAVIGATION.DASHBOARD);
+        } else {
+            navigation.navigate(NAVIGATION.LOGIN);
+        }
+        
     }
     return (
         <Container>
@@ -214,4 +221,10 @@ const RTGSScreen = ({
     )
 }
 
-export default RTGSScreen;
+const mapStateToProps = state => ({
+    token: state.authReducer.token,
+});
+
+export default connect(
+    mapStateToProps,
+)(RTGSScreen);

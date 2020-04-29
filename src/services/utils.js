@@ -1,8 +1,9 @@
 import moment from 'moment';
 import { Linking } from 'react-native';
+import { CONFIG } from './../../config';
 class Utils {
     getAppCommonDateFormat(date) {
-        return moment().format('DD-MMM-YYYY');
+        return moment(date ? date : new Date()).format('DD-MMM-YYYY');
     }
     getBoxShadow(radius, color, opacity) {
         return {
@@ -87,7 +88,7 @@ class Utils {
         getPaymentHTML(data) {
             return `
                 <div>
-                    <form #form ngNoForm action="https://hdfcprodsigning.in/onepayVAS/payprocessorV2" method="POST">
+                    <form #form ngNoForm action="${CONFIG.API.HDFC_FORM_PAYMENT}" method="POST">
                                     
                         <input type="text" type="hidden" name="reqData" value="${data.reqData}">
                         <input type="text" type="hidden" name="merchantId" value="${data.merchantId}">
@@ -132,6 +133,10 @@ class Utils {
             } else {
               Alert.alert(`Don't know how to open this URL: ${url}`);
             }
+        }
+
+        isProductionEnv(host) {
+            return (host || '').indexOf('portal-api') !== -1;
         }
 }
 

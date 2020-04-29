@@ -9,6 +9,7 @@ import { CONFIG } from '../../../config';
 import apiServices from '../../services/api-services';
 import icons from '../../../assets/icons';
 import utils from '../../services/utils';
+import { COMMON_STYLES } from '../common/styles';
 const {THEME} = CONFIG.APP;
 
 const resendTime = 12000;
@@ -23,10 +24,12 @@ class Login extends React.Component {
         otpSent: false,
         otpNumber: null,
         canReSendOtp: false,
+        otpSentResponse: null,
         timer,
         otpTextFieldValue: '',
         verifying: false,
         otpSending: false,
+        errText: null,
     }
     intervalCouter;
     timeoutInstance;
@@ -64,7 +67,7 @@ class Login extends React.Component {
     }
     sendOTP = async () => {
         console.log('send')
-        this.setState({otpSending: true});
+        this.setState({otpSending: true, errText: null});
         const {panNumber} = this.state;
         if(panNumber === "TEST123") {
             Toast.show({
@@ -87,6 +90,7 @@ class Login extends React.Component {
                         otpNumber: data && data.response && data.response.otp,
                         canReSendOtp: false,
                         verifying: false,
+                        otpSentResponse: data.response,
                     }, () => {
                         // setTimeout(()=>{
                         //     this.setState({otpTextFieldValue: data.response.otp + ''})
@@ -126,12 +130,18 @@ class Login extends React.Component {
                 }
                 this.setState({otpSending: false});
             }).catch(err => {
-                Toast.show({
-                    text: 'error in network',
-                    buttonText: "Okay",
-                    duration: 3000,
+                const {response: {data}} = err;
+                if(!data.response) {
+                    Toast.show({
+                        text: 'error in network',
+                        buttonText: "Okay",
+                        duration: 3000,
+                    });
+                }
+                this.setState({
+                    otpSending: false,
+                    errText: data.response,
                 });
-                this.setState({otpSending: false});
             })
         }
         // await authServices.setAuth('sdsd');
@@ -207,9 +217,14 @@ class Login extends React.Component {
         }
     }
     render() {
-        const {panNumber, otpSent, canReSendOtp, timer, otpTextFieldValue, verifying, otpSending} = this.state;
+        const {panNumber, otpSent, canReSendOtp, timer, otpTextFieldValue, verifying, otpSending, errText, otpSentResponse} = this.state;
         return(
             <Container style={{backgroundColor: '#fff'}}>
+                {!utils.isProductionEnv(CONFIG.API.HOST) && (
+                    <View style={COMMON_STYLES.envInfo}>
+                        <Text style={COMMON_STYLES.envInfoText}>Runing on Test ENV ({CONFIG.API.HOST})</Text> 
+                    </View>
+                )}
                 <StatusBar backgroundColor={THEME.PRIMARY}/>
                 {/* <Header noLeft>
                     <Left />
@@ -236,6 +251,9 @@ class Login extends React.Component {
                             <View style={styles.container}>
                                 <Text style={styles.title}>Login</Text>
                                 <Text style={styles.subtitle}>For existing Users</Text>
+                                {otpSentResponse && otpSent && (
+                                    <Text style={styles.otpSentInfo}>{otpSentResponse}</Text>
+                                )}
                                 <View style={styles.formRow}>
                                     {/* <Text style={styles.formRowLabel} >PAN / Aadhar Number</Text> */}
                                     <Item floatingLabel>
@@ -266,6 +284,9 @@ class Login extends React.Component {
                                             onChangeText={(text) => this.onFieldChange('otpTextFieldValue', text)}
                                             value={otpTextFieldValue}/> */}
                                     </View>
+                                )}
+                                {errText && (
+                                    <Text style={styles.errText}>{errText}</Text>
                                 )}
                                 {otpSent && canReSendOtp && (
                                     <View style={styles.otpSection}>
@@ -407,6 +428,20 @@ const styles = StyleSheet.create({
         fontWeight: '500',
         letterSpacing: 0.7,
         fontSize: 18
+    },
+    errText: {
+        color: THEME.DANGER,
+        fontWeight: '700',
+        fontSize: 12,
+        marginVertical: 5,
+    },
+    otpSentInfo: {
+        color: THEME.INFO,
+        fontWeight: '700',
+        marginBottom: 17,
+        marginTop: -11,
+        fontSize: 12,
+        textAlign: 'center',
     }
 })
 

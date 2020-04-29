@@ -1,3 +1,16 @@
+import Constants from 'expo-constants';
+import {DEV_ENV} from './environments/dev.env';
+import {PROD_ENV} from './environments/prod.env';
+let ENV;
+const {releaseChannel} = Constants.manifest;
+if(releaseChannel === 'prod') {
+    ENV = PROD_ENV();
+} else if(releaseChannel === 'dev-http') {
+    ENV = DEV_ENV(true);
+} else {
+    ENV = DEV_ENV();
+}
+console.log('Constants', Constants);
 export const CONFIG = {
     APP: {
         TITLE: 'TNPFC',
@@ -12,10 +25,9 @@ export const CONFIG = {
         }
     },
     API: {
-        // HOST: 'http://13.233.57.109:3001/tnpfc/v1/',
-        // HOST: 'https://portal-api.tnpowerfinance.com/tnpfc/v1/',
-        HOST: 'https://test-node-api.tnpowerfinance.com/tnpfc/v1/',
-        HDFC_TRASACTIONS_STATUS: 'https://hdfcprodsigning.in/onepayVAS/',
+        HOST: ENV.HOST,
+        HDFC_TRASACTIONS_STATUS: ENV.HDFC_TRASACTIONS_STATUS,
+        HDFC_FORM_PAYMENT: ENV.HDFC_FORM_PAYMENT,
     }
 }
 const THEME = CONFIG.APP.THEME;

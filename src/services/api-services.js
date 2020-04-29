@@ -20,6 +20,9 @@ class APIService {
         this.token = token;
         this.customerId = customerId;
     }
+    fetch(url) {
+        return axios.get(url, this.getConfig());
+    }
     getOTP(panNumber) {
         return axios.post(HOST + 'otplogin', {panNumber, channel: 'app'});
     }
@@ -79,6 +82,7 @@ class APIService {
         return axios.post(HOST + 'getProductDetails', {}, this.getConfig());
     }
     getPGPayload(data) {
+        console.log('getPGPayload', data, this.getConfig());
         data['customerId'] = this.customerId;
         return axios.post(HOST + 'getPGPayload', data, this.getConfig());
     }
@@ -88,7 +92,15 @@ class APIService {
     }
     getTxnDetails(merchantId, txnId) {
         console.log('getTxnDetails', merchantId, txnId);
-        return axios.post(HDFC_TRASACTIONS_STATUS + `getTxnDetails?merchantId=${merchantId}&txnId=${txnId}`);
+        if(merchantId && txnId) {
+            return axios.post(HDFC_TRASACTIONS_STATUS + `getTxnDetails?merchantId=${merchantId}&txnId=${txnId}`);
+        } else {
+            console.log('returing new promise')
+            return new Promise((res) => {
+                res({data: {}});
+            });
+        }
+        
     }
     documentVerify(data) {
         return axios.post(HOST + 'documentVerify', data, this.getConfig());
@@ -125,6 +137,9 @@ class APIService {
     }
     getBankDetails(ifscCode) {
         return axios.post(HOST + 'getBankDetails', {ifscCode}, this.getConfig());
+    }
+    getQrCodeUrl(encDepositNumber) {
+        return axios.post(HOST + 'getQrCodeUrl', {encDepositNumber}, this.getConfig());
     }
 }
 export default new APIService();

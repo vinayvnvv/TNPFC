@@ -1,8 +1,10 @@
 import React from 'react';
 import { StyleSheet, Image, Linking } from 'react-native';
 import { Container, Text, View, Button, Icon} from 'native-base';
-import { THEME } from '../../../../config';
+import { THEME, CONFIG } from '../../../../config';
 import { NAVIGATION } from '../../../navigation';
+import utils from '../../../services/utils';
+import { COMMON_STYLES } from '../styles';
 
 const StartScreen = ({
     navigation,
@@ -24,6 +26,11 @@ const StartScreen = ({
     }
     return (
         <Container style={styles.container}>
+            {!utils.isProductionEnv(CONFIG.API.HOST) && (
+                <View style={COMMON_STYLES.envInfo}>
+                    <Text style={COMMON_STYLES.envInfoText}>Runing on Test ENV ({CONFIG.API.HOST})</Text> 
+                </View>
+            )}
             <View style={styles.mask} />
             <View style={styles.content}>
                 <Text style={styles.title}>Tamil Nadu Power Finance and Infrastructure Development Corporation</Text>
@@ -42,7 +49,16 @@ const StartScreen = ({
                     <Icon name='arrow-forward' />
                 </Button>
                 <Button style={styles.btn} iconRight warning onPress={()=>navigate(NAVIGATION.LOGIN)}>
-                    <Text>Exisiting Depositor Access</Text>
+                    <Text>Existing Depositor Access</Text>
+                    <Icon name='arrow-forward' />
+                </Button>
+
+                <Button 
+                    style={[styles.btn, {backgroundColor: '#2196f3'}]} 
+                    iconRight dark 
+                    onPress={()=>navigate(NAVIGATION.QR_CODE)}>
+                    {/* <Icon name={'ios-qr-scanner'} style={{position: 'relative', left: 20}}/> */}
+                    <Text>QR Code Scanner</Text>
                     <Icon name='arrow-forward' />
                 </Button>
                 <View style={styles.btm}>
@@ -109,7 +125,7 @@ const styles = StyleSheet.create({
         marginTop: 3,
     },
     btn: {
-        width: '68%',
+        width: '83%',
         marginTop: 11,
         borderBottomRightRadius: 18,
     },

@@ -9,7 +9,7 @@
       "android",
       "web"
     ],
-    "version": "1.1.0",
+    "version": "1.3.0",
     "orientation": "portrait",
     "icon": "./assets/logo.png",
     "primaryColor": "#cc0000",
@@ -30,8 +30,8 @@
     },
     "android": {
       "package": "com.tnpfc.mobile",
-      "versionCode": 1,
-      "googleServicesFile": "./assets/google-services.json"
+      "versionCode": 3,
+      "googleServicesFile": "./google-services.json"
     },
     "ios": {
       "bundleIdentifier": "com.tnpfc.mobile",

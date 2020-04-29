@@ -1,5 +1,5 @@
 import React, {useState} from 'react';
-import { StyleSheet } from 'react-native';
+import { StyleSheet, Dimensions } from 'react-native';
 import StepNavigation from './step-navigation';
 import { View, Icon, Item, Input, Label, Text, Button, Spinner } from 'native-base';
 import { THEME } from '../../../config';
@@ -8,6 +8,7 @@ import CheckBox from '../common/components/checkbox';
 import ListItemPanel from '../common/components/list-item-panel';
 import SuccessPayment from '../app/fd-calc/success-payment';
 import { TouchableOpacity } from 'react-native-gesture-handler';
+import {TEXTS} from './../../constants';
 
 const PaymentSection = ({
     onPreviousStep,
@@ -86,19 +87,33 @@ const PaymentSection = ({
                             ]}/>
                     </View>
                     <View style={styles.acR}>
-                        <CheckBox checked={accept} onChange={onAcceptChange}/>
-                        <Text style={styles.acRText}>Accept all terms and conditions of the scheme's, before you, continue to pay</Text>
+                        <View style={{width: 32}}>
+                            <CheckBox checked={accept} onChange={onAcceptChange}/>
+                        </View>
+                        <View style={{flexDirection: 'row', flexGrow: 1}}>
+                            <TouchableOpacity style={styles.acRTextC} onPress={onAcceptChange}>
+                        <Text style={styles.acRTextBlue}>{TEXTS.TERMS}</Text>
+                            </TouchableOpacity>
+                        </View>
                     </View>
-                    <View style={styles.acR}>
+                    {/* <View style={styles.acR}>
                         <View style={{width: 24}}/>
                         <TouchableOpacity style={{flexGrow: 1}} onPress={goToTerms}>
                             <Text style={styles.acRTextBlue}>Terms and Conditions</Text>
                         </TouchableOpacity>
-                    </View>
+                    </View> */}
                     <Text>Payment Type</Text>
                     <View style={styles.acR}>
-                        <CheckBox checked={paymentType === 'net'} onChange={() => onPaymentTypeChange('net')}/>
-                        <Text style={styles.acRText}>Net Banking / UPI / Debit Card</Text>
+                        <CheckBox 
+                            // disabled 
+                            checked={paymentType === 'net'} 
+                            onChange={() => onPaymentTypeChange('net')}/>
+                        <Text style={
+                            [
+                                styles.acRText, 
+                                // {opacity: 0.5}
+                            ]
+                        }>Net Banking / UPI / Debit Card</Text>
                     </View>
                     <View style={[styles.acR, styles.acRCenter, {marginTop: -5}]}>
                         <CheckBox checked={paymentType === 'rtgs'} onChange={() => onPaymentTypeChange('rtgs')}/>
@@ -140,9 +155,14 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'flex-start',
         marginVertical: 15,
+        maxWidth: '100%',
     },
     acRCenter: {
-        alignItems: 'center'
+        alignItems: 'center',
+        flexWrap: 'wrap'
+    },
+    acRTextC: {
+        width: '100%',
     },
     acRText: {
         flexGrow: 1,
@@ -153,8 +173,13 @@ const styles = StyleSheet.create({
     },
     acRTextBlue: {
         fontSize: 13,
+        maxWidth: Dimensions.get('window').width - ((2 * THEME.LAYOUT_PADDING) + 32),
+        flexGrow: 1,
+        flexWrap: 1,
+        flexWrap: 'wrap',
         color: THEME.PRIMARY,
         fontWeight: '700',
+        marginTop: -3,
     },
     verifiedC: {
         flexDirection: 'row',

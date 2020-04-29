@@ -17,7 +17,10 @@ import NomineeInfo from './nominee-info';
 import PaymentSection from './payment-section';
 import { getInterestPayment } from '../common/components/fd-calculater';
 import { NAVIGATION } from '../../navigation';
-const DEBUG = true;
+import TermsConditions from '../common/components/terms-condtions';
+
+// import * as FileSystem from 'expo-file-system';
+const DEBUG = false;
 const steps = [
     {label: 'Select Plan'}, {label: 'Personal Information'}, {label: 'Address Information'}, 
     {label: 'Nominee Details'}, {label: 'Payment'},
@@ -40,17 +43,28 @@ class CreateFD extends React.Component {
         authToken: null,
         createdUserData: null,
         accept: false,
-        paymentType: 'net',
+        paymentType: 'rtgs',
         paymentStatus: null,
         txnDetails: null,
         transactionStatus: null,
         panStatusCode: null,
+        termsModal: false,
     }
     scroll;
     async componentDidMount() {
         const {fetchProductDetails, productDetails} = this.props;
         if(!productDetails) await fetchProductDetails();
         this.setState({init: true});
+
+
+        // const downloadResumable = FileSystem.createDownloadResumable(
+        //     'https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf',
+        //     FileSystem.documentDirectory + 'aa.pdf',
+        //     {},
+        //   );
+        // const {uri} = await downloadResumable.downloadAsync();
+        // console.log('Finished downloading to ', uri);
+
     }
     goBack = () => {
         const {navigation} = this.props;
@@ -165,7 +179,12 @@ class CreateFD extends React.Component {
         });
     }
     onAcceptChange = () => {
-        this.setState({accept: !this.state.accept})
+        if(this.state.accept) {
+            this.setState({accept: !this.state.accept})
+        } else {
+            this.toggleTermsModal();
+        }
+        
     }
     validateAadhar = number => {
         if(this.state.aadharStatus === 'loading' || this.state.aadharStatus === true) return;
@@ -433,6 +452,12 @@ class CreateFD extends React.Component {
         const {navigation} = this.props;
         navigation.navigate(NAVIGATION.TERMS);
     }
+    toggleTermsModal = isOk => {
+        this.setState({
+            termsModal: !this.state.termsModal,
+            accept: isOk ? true : this.state.accept,
+        })
+    }
     renderStepContainer = () => {
         const {
             currentStep,
@@ -513,8 +538,8 @@ class CreateFD extends React.Component {
         }
     }
     renderStep = () => {
-        const {currentStep} = this.state;
-        return <View style={styles.stepTitleC}>
+        const {currentStep, termsModal} = this.state;
+        return <View style={[!termsModal ? utils.getBoxShadow(4, "#444") : {}, styles.stepTitleC]}>
                 <Text style={styles.stepTitle}>
                     {steps[currentStep].label}
                 </Text>
@@ -524,7 +549,7 @@ class CreateFD extends React.Component {
             </View>
     }
     render() {
-        const {currentStep, init} = this.state;
+        const {currentStep, init, termsModal} = this.state;
         return (
             init ? 
                 <Container>
@@ -556,6 +581,11 @@ class CreateFD extends React.Component {
                         </ScrollView>
                         
                     </View>
+                    <TermsConditions 
+                        style={{zIndex: 999}}
+                        onOk={()=>this.toggleTermsModal(true)}
+                        onCancel={()=>this.toggleTermsModal()} 
+                        visible={termsModal}/>
                 </Container>
                 :
                 <Container>
@@ -577,7 +607,7 @@ const styles = StyleSheet.create({
         marginVertical: 13,
     },
     stepTitleC: {
-        ...utils.getBoxShadow(4, '#000'),
+        // ...utils.getBoxShadow(4, '#000'),
         backgroundColor: '#f0f0f0',
         paddingHorizontal: THEME.LAYOUT_PADDING,
         paddingVertical: 11,

@@ -1,7 +1,7 @@
 import React from 'react';
 import {connect} from 'react-redux';
 import { StyleSheet, Platform } from 'react-native';
-import { Container, View, Header, Left, Button, Icon, Body, Right, Title, Text, Label, Input, Item, Spinner } from 'native-base';
+import { Container, View, Header, Left, Button, Icon, Body, Right, Title, Text, Label, Input, Item, Spinner, Toast } from 'native-base';
 import { THEME } from '../../../../config';
 import RadioBtnGroup from '../../common/components/radio-btn-grp';
 import Steps from '../../common/components/steps';
@@ -20,6 +20,8 @@ import SuccessPayment from './success-payment';
 import PersonalInfo from '../deposite/personal-info';
 import { fetchFDSummary } from '../../../store/actions/deposite-actions';
 import FDCalculater, { getFdCalcInitValues, getInterestPayment } from '../../common/components/fd-calculater';
+import TermsConditions from '../../common/components/terms-condtions';
+import { TEXTS } from '../../../constants';
 
 class FDCalc extends React.Component {
     state = {
@@ -32,11 +34,12 @@ class FDCalc extends React.Component {
         form: getFdCalcInitValues(),
         maturityDate: null,
         formErr: false,
-        paymentType: 'card',
+        paymentType: 'rtgs',
         txnDetails: null,
         transactionStatus: null,
         initStep3Status: false,
         ROI: null,
+        termsModal: false,
     }
     pgPayloadData;
     goBack = () => {
@@ -63,7 +66,7 @@ class FDCalc extends React.Component {
         console.log(!formErr && acceptTerms);
         return !formErr && acceptTerms;
     }
-    onPaymentClick = () => {
+    onPaymentClick = async () => {
         // if(!this.selectedProduct) return;
         this.setState({
             currentStep: 0,
@@ -78,6 +81,7 @@ class FDCalc extends React.Component {
             },
             ROI,
             maturityAmount,
+            paymentType,
         } = this.state;
         const {navigation, productDetails} = this.props;
         // let ROI = 0;
@@ -108,7 +112,7 @@ class FDCalc extends React.Component {
             interestPayment: getInterestPayment(interest),
             rateOfInterest: ROI,
             maturityAmount,
-            paymentType: 'NETBANKING',
+            paymentType: paymentType === 'card' ? 'NETBANKING' : 'RTGS',
         };
         apiServices.getPGPayload(data).then(res => {
             console.log(res);
@@ -150,16 +154,27 @@ class FDCalc extends React.Component {
                 </script>
             `;
             // this.setState({paymentHtml: html});
-            navigation.navigate(NAVIGATION.PAYMENT_PAGE, {
-                html,
-                onPaymentComplete: this.onPaymentComplete
-            });
+            if(this.state.paymentType === 'card') {
+                navigation.navigate(NAVIGATION.PAYMENT_PAGE, {
+                    html,
+                    onPaymentComplete: this.onPaymentComplete
+                });
+            } else {
+                this.onPaymentComplete();
+            }
+            
+        }).catch(err => {
+            console.log('err', err.status, err.response);
+            if(err.response.status === 403) {
+                Toast.show({text: 'Login Session has been Expired, Please Logout and Re-Sign in again!', type: 'danger', duration: 4000});
+            }
         })
     }
     onPaymentComplete = () => {
         console.log('onPaymentComplete', this.pgPayloadData);
         this.setState({currentStep: 1, transactionStatus: null});
-        const {transactionId, merchantId} = this.pgPayloadData;
+        const {navigation} = this.props;
+        const {transactionId, merchantId, beneficiaryAccountNumber} = this.pgPayloadData;
         apiServices.getTxnDetails(merchantId, transactionId).then(_res => {
             console.log('getTxnDetails', _res.data);
             const d = _res.data;
@@ -169,10 +184,20 @@ class FDCalc extends React.Component {
             console.log('transactionStatus', transactionStatus);
             this.setState({transactionStatus, txnDetails: transactionStatus ? 'loading': null});
             if(transactionStatus === true) {
-                apiServices.paymentSucess(transactionId, null, 'NETBANKING').then(res => {
+                apiServices.paymentSucess(
+                    transactionId ? transactionId : beneficiaryAccountNumber, 
+                    null, 
+                    this.state.paymentType === 'card' ? 'NETBANKING' : 'RTGS'
+                ).then(res => {
                     console.log('apiServices');
                     const {data} = res;
                     console.log(data, data.response, data.response[0]);
+                    if(this.state.paymentType !== 'card') {
+                        navigation.navigate(NAVIGATION.RTGS_SCREEN, {
+                            paymentInfo: data,
+                        });
+                        return;
+                    }
                     if(data.response) {
                         console.log('success 200')
                         this.setState({txnDetails: data.response[0]});
@@ -229,6 +254,14 @@ class FDCalc extends React.Component {
             ROI,
         })
     }
+    toggleTermsModal = () => {
+        this.setState({termsModal: !this.state.termsModal});
+    }
+    onAcceptCheckBoxChange = () => {
+        const {acceptTerms} = this.state;
+        if(acceptTerms) this.onChangeState('acceptTerms', false);
+        else this.toggleTermsModal();
+    }
     render() {
         const {
             form: {
@@ -250,6 +283,7 @@ class FDCalc extends React.Component {
             txnDetails,
             transactionStatus,
             initStep3Status,
+            termsModal,
         } = this.state;
         const {fdSummary, userDetails, productDetails} = this.props;
         return (
@@ -262,7 +296,7 @@ class FDCalc extends React.Component {
                             </Button>
                         </Left>
                         <Body>
-                            <Title>FD Calculator</Title>
+                            <Title>New Fixed Deposit</Title>
                         </Body>
                         <Right />
                     </Header>
@@ -372,12 +406,12 @@ class FDCalc extends React.Component {
                                     <View style={styles.formRH}>
                                         <View style={styles.formRHF}>
                                             <CheckBox 
-                                                onChange={()=>this.onChangeState('acceptTerms', !acceptTerms)}
+                                                onChange={this.onAcceptCheckBoxChange}
                                                 checked={acceptTerms}/>
                                         </View>
                                         <View style={styles.formRHL}>
-                                            <TouchableOpacity onPress={()=>this.onChangeState('acceptTerms', !acceptTerms)}>
-                                                <Text style={[styles.formRLT, COMMON_STYLES.textPrimary]}>Accept all terms and conditions of the scheme's, before you, continue to pay</Text>
+                                            <TouchableOpacity onPress={this.onAcceptCheckBoxChange}>
+                                                <Text style={[styles.formRLT, COMMON_STYLES.textPrimary]}>{TEXTS.TERMS}</Text>
                                             </TouchableOpacity>
                                         </View>
                                     </View>
@@ -390,6 +424,7 @@ class FDCalc extends React.Component {
                                             <View style={styles.formRH}>
                                                 <View style={styles.formRHF}>
                                                     <CheckBox 
+                                                        // disabled
                                                         onChange={()=>this.onChangeState('paymentType', 'card')}
                                                         checked={paymentType === 'card'}/>
                                                 </View>
@@ -404,15 +439,12 @@ class FDCalc extends React.Component {
                                             <View style={styles.formRH}>
                                                 <View style={styles.formRHF}>
                                                     <CheckBox 
-                                                        disabled
-                                                        onChange={()=>this.onChangeState('paymentType', 'neft')}
-                                                        checked={paymentType === 'neft'}/>
+                                                        onChange={()=>this.onChangeState('paymentType', 'rtgs')}
+                                                        checked={paymentType === 'rtgs'}/>
                                                 </View>
                                                 <View style={styles.formRHL}>
                                                     <TouchableOpacity 
-                                                        disabled
-                                                        style={{opacity: 0.5}} 
-                                                        onPress={()=>this.onChangeState('paymentType', 'neft')}>
+                                                        onPress={()=>this.onChangeState('paymentType', 'rtgs')}>
                                                         <Text style={[styles.formRLT, COMMON_STYLES.textPrimary]}>RTGS / NEFT</Text>
                                                     </TouchableOpacity>
                                                 </View>
@@ -461,6 +493,13 @@ class FDCalc extends React.Component {
                             )  
                         )}                       
                     </Container>
+                    <TermsConditions 
+                        visible={termsModal} 
+                        onOk={() => {
+                            this.onChangeState('acceptTerms', true);
+                            this.toggleTermsModal();
+                        }}
+                        onCancel={this.toggleTermsModal}/>
                 </Container>
             ) : (
                 <Container>

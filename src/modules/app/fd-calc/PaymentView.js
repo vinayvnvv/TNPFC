@@ -37,7 +37,7 @@ class PaymentView extends React.Component {
         Alert.alert('Warning', 'Are you sure to cancel transaction?', [
             {text: 'Yes', onPress: () => {
                 BackHandler.removeEventListener('hardwareBackPress', this.handleBackButtonClick);
-                onCancel();
+                if(onCancel) onCancel();
                 navigation.goBack();
             }},
             {text: 'No', onPress: () => console.log('No'), style: 'cancel'},

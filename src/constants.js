@@ -40,5 +40,9 @@ export const CONSTANTS = {
     }
 }
 
+const TEXTS = {
+    TERMS: 'Click here to read the terms and conditions before you proceed to select payment type',
+}
+
 const {REGEX} = CONSTANTS;
-export {REGEX};
+export {REGEX, TEXTS};

@@ -16,4 +16,5 @@ export const NAVIGATION = {
     TERMS: 'TERMS',
     RTGS_SCREEN: 'RTGS_SCREEN',
     ADD_SERVICE: 'ADD_SERVICE',
+    QR_CODE: 'QR_CODE',
 }

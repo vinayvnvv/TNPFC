@@ -35,5 +35,19 @@ export const COMMON_STYLES = StyleSheet.create({
     modalContent: {
         backgroundColor: '#fff',
         borderRadius: 3,
+    },
+    envInfo: {
+        position: 'absolute',
+        top: 0,
+        left: 0,
+        width: '100%',
+        paddingVertical: 5,
+        paddingHorizontal: 11,
+        backgroundColor: THEME.ORANGE,
+        zIndex: 88,
+    },
+    envInfoText: {
+        fontSize: 10,
+        fontWeight: '600'
     }
 })
