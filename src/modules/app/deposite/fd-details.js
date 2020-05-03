@@ -109,7 +109,7 @@ class FDDetails extends React.Component {
         apiServices.applyLoan(depositNumber, loanAmt).then(res => {
             console.log('res-->', res);
             const {data} = res;
-            if(data.responseCode === '200') {
+            if(data.responseCode === '200' || data.response) {
                 this.setState({applyLoanStatus: {type: 'applyLoan', status: 'success', data: data.response}})
             } else {
                 this.setState({
@@ -177,9 +177,9 @@ class FDDetails extends React.Component {
                             <ScrollView heading="Nominee">
                                 <Nominee fdSummary={fdSummary}/>
                             </ScrollView>
-                            {/* <ScrollView heading="Certificate">
-                                <Certificate />
-                            </ScrollView> */}
+                            <ScrollView heading="Certificate">
+                                <Certificate fdSummary={fdSummary} />
+                            </ScrollView>
                             <ScrollView heading="Re-new FD">
                                 <RenewFD 
                                     onRenewFD={this.onRenewFD}

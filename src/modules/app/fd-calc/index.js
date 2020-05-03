@@ -284,6 +284,7 @@ class FDCalc extends React.Component {
             transactionStatus,
             initStep3Status,
             termsModal,
+            ROI,
         } = this.state;
         const {fdSummary, userDetails, productDetails} = this.props;
         return (
@@ -396,7 +397,7 @@ class FDCalc extends React.Component {
                                             ['Maturity Amount', utils.convertToINRFormat(maturityAmount)], 
                                             ['Start Date', moment(new Date()).format('DD/MM/YYYY')],
                                             ['Maturity Date', maturityDate],
-                                            ['Interest Payment', (maturityAmount - amount)],
+                                            ['Interest Rate', ROI + '%'],
                                             ['Months', period],
                                         ]}
                                         panelTitleLabel={'Deposit Info'}/>

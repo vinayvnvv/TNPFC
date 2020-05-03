@@ -42,7 +42,7 @@ export const getFdCalcInitValues = () => ({
 });
 
 export const getInterestPayment = payment => {
-    if(payment === interestOptions[0].value) return 12;
+    if(payment === interestOptions[0].value) return 30;
     if(payment === interestOptions[1].value) return 90;
     if(payment === interestOptions[2].value) return 360;
     if(payment === interestOptions[3].value) return 0;

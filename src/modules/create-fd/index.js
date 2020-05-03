@@ -483,7 +483,8 @@ class CreateFD extends React.Component {
             districts, 
             relationships, 
             residentList, 
-            addressProofDocs
+            addressProofDocs,
+            navigation,
         } = this.props;
         switch(currentStep) {
             case 0:
@@ -506,6 +507,7 @@ class CreateFD extends React.Component {
                         states={states}
                         data={addressInfo}
                         districts={districts}
+                        navigation={navigation}
                         addressProofDocs={addressProofDocs}
                         onSubmit={this.onAddressFormSubmit}
                         onPreviousStep={this.onPreviousStep} />

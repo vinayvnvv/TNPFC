@@ -10,6 +10,7 @@ import FormItem from '../common/components/form-item';
 import { REGEX } from '../../constants';
 import * as ImagePicker from 'expo-image-picker';
 import CheckBox from '../common/components/checkbox';
+import { NAVIGATION } from '../../navigation';
 const TEXT_INPUT_TRIGGER = Platform.OS === 'web' ? 'onChange' : 'onChangeText';
 
 
@@ -78,6 +79,22 @@ class AddressInfo extends React.Component {
         let result = await ImagePicker.launchImageLibraryAsync(options);
         const {uri} = result;
         setFieldValue(field, uri);
+    }
+    onUpload = (name, url) => {
+        const {form: {setFieldValue}} = this.props;
+        console.log('Upload - success', name, url);
+        setFieldValue('address_proof', url);
+    }
+    uploadFile = () => {
+        const {navigation} = this.props;
+        navigation.navigate(NAVIGATION.UPLOADER, {
+            name: 'address',
+            onUpload: this.onUpload,
+            s3Folder: 'address',
+            accept: ['image/jpeg', 'image/jpg', 'image/png', 'application/pdf'],
+            invalidFileErrMsg: 'Please select only image/pdf file',
+            helpText: '(Only Image/PDF files are allowed)',
+        });
     }
     render() {
         const {
@@ -199,7 +216,7 @@ class AddressInfo extends React.Component {
                                 <Text style={CREATE_FD_STYLES.sectionTitleCText}>Upload Address Proof</Text>
                                 {getFieldsValue('address_proof') ? (
                                     <Button 
-                                        onPress={() => this.pickImage()}
+                                        onPress={() => this.uploadFile()}
                                         info
                                         small 
                                         style={styles.changeFileBtn}>
@@ -236,10 +253,10 @@ class AddressInfo extends React.Component {
                                         style={styles.panImage}/>
                                     </>
                                 ) : (
-                                    <TouchableOpacity onPress={() => this.pickImage()}>
+                                    <TouchableOpacity onPress={() => this.uploadFile()}>
                                         <View style={styles.uploader}>
                                             <Icon style={styles.uploaderIcon} name={'cloud-upload'}/>
-                                            <Text style={styles.uploaderText}>Upload Profile Pic</Text>
+                                            <Text style={styles.uploaderText}>Upload Address Proof</Text>
                                         </View>
                                     </TouchableOpacity>
                                 )}

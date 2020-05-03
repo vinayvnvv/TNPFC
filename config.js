@@ -28,6 +28,7 @@ export const CONFIG = {
         HOST: ENV.HOST,
         HDFC_TRASACTIONS_STATUS: ENV.HDFC_TRASACTIONS_STATUS,
         HDFC_FORM_PAYMENT: ENV.HDFC_FORM_PAYMENT,
+        S3_SIGNED_URL: 'https://dms-api.tnpowerfinance.com/dms/',
     }
 }
 const THEME = CONFIG.APP.THEME;

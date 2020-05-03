@@ -26,6 +26,7 @@ import RTGSScreen from './modules/create-fd/rtgs-screen';
 import Test from './modules/common/components/test';
 import AddService from './modules/app/service-request/add-service';
 import QRCodeScanner from './modules/common/components/qr-code-scanner';
+import { Uploader } from './modules/common/components/uploader';
 const Stack = createStackNavigator();
 class Index extends React.Component {
     state = {
@@ -118,6 +119,10 @@ class Index extends React.Component {
                             <Stack.Screen
                                 name={NAVIGATION.QR_CODE}
                                 component={QRCodeScanner}
+                                />
+                            <Stack.Screen
+                                name={NAVIGATION.UPLOADER}
+                                component={Uploader}
                                 />
                         </>
                     ) : (

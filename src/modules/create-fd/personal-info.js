@@ -144,9 +144,9 @@ const PersonalInfo = ({
                             {pattern: REGEX.NAME_WITH_SPACE.PATTERN, message: REGEX.NAME_WITH_SPACE.MESSAGE('Name')}
                         ],
                         localData: {
-                            label: 'Name',
+                            label: 'Full Name',
                         }
-                    })(<TextInput placeholder={'Enter First Name'} />)}
+                    })(<TextInput placeholder={'Enter Full Name'} />)}
 
                     {/* {createField('last_name', {
                         trigger: TEXT_INPUT_TRIGGER,
@@ -330,7 +330,7 @@ const PersonalInfo = ({
                         <TouchableOpacity onPress={() => pickImage('pan_image')}>
                             <View style={styles.uploader}>
                                 <Icon style={styles.uploaderIcon} name={'cloud-upload'}/>
-                                <Text style={styles.uploaderText}>Upload PAN/AADHAAR ID</Text>
+                                <Text style={styles.uploaderText}>Upload PAN</Text>
                             </View>
                         </TouchableOpacity>
                     )}
@@ -342,7 +342,7 @@ const PersonalInfo = ({
 
             <View style={CREATE_FD_STYLES.section}>
                 <View style={CREATE_FD_STYLES.sectionTitleC}>
-                    <Text style={CREATE_FD_STYLES.sectionTitleCText}>Upload Profile Pic</Text>
+                    <Text style={CREATE_FD_STYLES.sectionTitleCText}>Upload Depositor Photo</Text>
                     {getFieldsValue('profile_image') ? (
                         <Button 
                             onPress={() => pickImage('profile_image')}
@@ -364,7 +364,7 @@ const PersonalInfo = ({
                         <TouchableOpacity onPress={() => pickImage('profile_image')}>
                             <View style={styles.uploader}>
                                 <Icon style={styles.uploaderIcon} name={'cloud-upload'}/>
-                                <Text style={styles.uploaderText}>Upload Profile Pic</Text>
+                                <Text style={styles.uploaderText}>Upload Depositor Photo</Text>
                             </View>
                         </TouchableOpacity>
                     )}

@@ -1,7 +1,7 @@
 import axios from 'axios';
 import { CONFIG } from '../../config';
 const {API} = CONFIG;
-const {HOST, HDFC_TRASACTIONS_STATUS} = API;
+const {HOST, HDFC_TRASACTIONS_STATUS, S3_SIGNED_URL} = API;
 class APIService {
     token;
     customerId;
@@ -140,6 +140,29 @@ class APIService {
     }
     getQrCodeUrl(encDepositNumber) {
         return axios.post(HOST + 'getQrCodeUrl', {encDepositNumber}, this.getConfig());
+    }
+    uploadToS3(url, file) {
+        return new Promise((resolve, reject) => {
+            const xhr = new XMLHttpRequest();
+            xhr.open('PUT', url);
+            xhr.onreadystatechange = () => {
+                if (xhr.readyState === 4) {
+                if(xhr.status === 200) {
+                    resolve(xhr.response);
+                } else {
+                    reject(true);
+                }
+                }
+            };
+            xhr.send(file);
+        })
+    }
+    getSignedURL(docType, fileName) {
+        const data ={
+            docType, fileName, customerId: this.customerId || 'c34234',
+        };
+        console.log('getSignedURL', data);
+        return axios.post(S3_SIGNED_URL + 'getSignedURL', data, this.getConfig());
     }
 }
 export default new APIService();

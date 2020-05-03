@@ -31,7 +31,7 @@
       "android": {
         "package": "com.tnpfc.test",
         "versionCode": 3,
-        "googleServicesFile": "./google-services.json"
+        "googleServicesFile": "./google-services-test.json"
       },
       "ios": {
         "bundleIdentifier": "com.tnpfc.test",

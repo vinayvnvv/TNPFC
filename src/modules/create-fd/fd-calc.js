@@ -54,7 +54,7 @@ const FDCalc = ({
                     ['Maturity Amount', utils.convertToINRFormat(calcValues.maturityAmount)], 
                     ['Start Date', moment(new Date()).format('DD/MM/YYYY')],
                     ['Maturity Date', calcValues.maturityDate],
-                    ['Interest Payment', (calcValues.maturityAmount - form.amount)],
+                    ['Interest Rate', (calcValues.ROI) + '%'],
                     ['Months', form.period],
                 ]}
                 panelTitleLabel={'Deposit Info'}/>
