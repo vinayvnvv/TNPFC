@@ -1,6 +1,6 @@
 import React from 'react';
 import { Container, View, Header, Left, Button, Icon, Title, Body, Right, Toast, Spinner } from 'native-base';
-import { StyleSheet, Text, BackHandler } from 'react-native';
+import { StyleSheet, Text, BackHandler, Platform } from 'react-native';
 import utils from './../../../services/utils';
 import { THEME } from '../../../../config';
 import { TouchableOpacity } from 'react-native-gesture-handler';
@@ -112,7 +112,7 @@ class Uploader extends React.Component {
         } = this.props;
         // ImagePicker saves the taken photo to disk and returns a local URI to it
         let localUri = result.uri;
-        let filename = localUri.split('/').pop();
+        let filename = Platform.OS === 'web' ? result.name.split('.').pop()  : localUri.split('/').pop();
         this.setState({loading: true});
         try {
             this.getFileObject(localUri, filename,  (fileObject) => {

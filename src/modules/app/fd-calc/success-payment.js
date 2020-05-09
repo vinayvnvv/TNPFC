@@ -1,7 +1,7 @@
 import React from 'react';
 import { COMMON_STYLES } from '../../common/styles/index.js';
 import { View, Text, Button, Icon } from 'native-base';
-import {StyleSheet} from 'react-native';
+import {StyleSheet, Platform} from 'react-native';
 import LottieView from 'lottie-react-native';
 import utils from '../../../services/utils.js';
 import { THEME } from '../../../../config.js';
@@ -21,11 +21,13 @@ const SuccessPayment = ({
         <View>
             {(txnDetails === 'loading' || transactionStatus === null)  && (
                 <View style={[COMMON_STYLES.spinnerContainerFullScreen, {marginTop: 50, height: 300}]}>
-                    <LottieView
-                        style={{width: 80, height: 80}}
-                        autoPlay
-                        source={require('./../../../../assets/anim/loader-1.json')}
-                    />
+                    {Platform.OS !== 'web' && (
+                        <LottieView
+                            style={{width: 80, height: 80}}
+                            autoPlay
+                            source={require('./../../../../assets/anim/loader-1.json')}
+                        />
+                    )}
                     <Text style={COMMON_STYLES.spinnerContainerFullScreenText}>Fetching Transaction...</Text>
                 </View>
             )}

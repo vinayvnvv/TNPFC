@@ -16,11 +16,12 @@ const ReportsIcon = require('./reports.png');
 
 const UserIcon = require('./user.png');
 const LoginWelcomeIcon = require('./login-welcome.png');
+const PdfIcon = require('./pdf.png');
 
 
 export default  {
     ActiveFDIcon, AllDepositeIcon, ClosedFdIcon, MaturedDepositeIcon,
     FDIcon, LoanReqIcon, MyLoansIcon, FDCalcIcon, CertificateIcon, 
     ActivityIcon, AppStatusIcon, ServiceReqIcon, ReportsIcon,
-    UserIcon, LoginWelcomeIcon,
+    UserIcon, LoginWelcomeIcon, PdfIcon,
 }

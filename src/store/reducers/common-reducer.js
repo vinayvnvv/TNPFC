@@ -14,6 +14,7 @@ const initialState = {
     relationships: [],
     residentList: [],
     addressProofDocs: [],
+    versionData: null,
 };
 
 
@@ -108,6 +109,11 @@ const commonReducer = (state = initialState, action) => {
             return {
                 ...state,
                 addressProofDocs: action.payload
+            }
+        case COMMON.ON_MOBILE_APP_VERSION_CHECK:
+            return {
+                ...state,
+                versionData: action.payload
             }
         
         default: 

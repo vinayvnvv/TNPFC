@@ -1,14 +1,39 @@
 import React from 'react';
 import { Container, Header, Button, Icon, Body, Title, Left, Right, View, Text } from 'native-base';
 import { NavigationContainer } from '@react-navigation/native';
+import { Platform, StyleSheet } from 'react-native';
 import WebView from 'react-native-webview';
 import { NAVIGATION } from '../../navigation';
 import { connect } from 'react-redux';
-
+import utils from '../../services/utils';
+import apiServices from '../../services/api-services';
+const sampleObj = {paymentInfo: {
+    "responseCode": 200,
+    "paymentType": "RTGS",
+    "scheme": "RIPS",
+    "period": 24,
+    "interestRate": 7.8,
+    "frequency": "Quaterly",
+    "beneficiaryAccountNumber": "TNPFCL1588661289237966",
+    "amountToBeRemitted": 25000,
+    "amountinWords": "Twenty Five Thousand Rupees Only",
+    "beneficiaryBank": "HDFC",
+    "ifscCode": "HDFC0000082",
+    "nameofBeneficiaryAccount": "TAMILNADU POWER FIN AND INF DEV COR LTD",
+    "paymentReference": "New FD",
+    "date": " 05 May 2020 ",
+    "maturityAmount": 28900,
+    "depositorName": "RAMESHA CHENNAPPA",
+    "paymentAdviceUrl": "https://d6m921ss8dr76.cloudfront.net/paymentAdvice/TNPFCL1588661289237966-paymentAdvice.pdf"
+  }
+};
 const RTGSScreen = ({
     navigation,
     route,
     token,
+    userDetails: {
+        mobileNumber
+    } = {},
 }) => {
     const {
         paymentInfo: {
@@ -26,11 +51,33 @@ const RTGSScreen = ({
             paymentReference,
             response
         } = {},
-    } = route.params;
+    } = route.params || sampleObj;
     const depositer = response && response[0] ? response[0] : {};
     const {
         depositorName
     } = depositer;
+    const downloadFile = () => {
+        const {
+            paymentInfo: {
+                paymentAdviceUrl,
+                depositorName,
+            } = {},
+        } = route.params || sampleObj;
+        utils.downloadFile(paymentAdviceUrl, () => {
+            console.log('file downloaded');
+            const data = {
+                depositorName: depositorName,
+                phoneNumber: mobileNumber,
+                purpose: 'download'
+            }
+            apiServices.sendSms(data)
+                .then(res => {
+                    console.log(res);
+                }).catch(err => {
+                    console.log(err.response);
+             });
+        });
+    };
     const html = `<!DOCTYPE html>
     <html lang="en">
     <head>
@@ -214,15 +261,36 @@ const RTGSScreen = ({
                 </Body>
                 <Right />
             </Header>
-            <Container style={{flex: 1}}>
-                <WebView source={{html}} />
+            <Container style={styles.container}>
+                {Platform.OS === 'web' ? (
+                    <iframe srcDoc={html} style={{flex: 1}} />
+                ) : (
+                    <WebView source={{html}} />
+                )}
+                <Button info block style={styles.btn} onPress={downloadFile}>
+                    <Icon name={'download'}/>
+                    <Text>Download</Text>
+                </Button>
             </Container>
         </Container>
     )
 }
 
+const styles = StyleSheet.create({
+    container: {
+        flex: 1,
+        paddingBottom: 42,
+    },
+    btn: {
+        position: "absolute",
+        bottom: 0,
+        width: '100%',
+    }
+})
+
 const mapStateToProps = state => ({
     token: state.authReducer.token,
+    userDetails: state.commonReducer.userDetails,
 });
 
 export default connect(

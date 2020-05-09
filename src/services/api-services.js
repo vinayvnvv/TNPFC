@@ -44,19 +44,13 @@ class APIService {
     fetchFdLoans() {
         return axios.post(HOST + 'getFdLoans', {customerId: this.customerId}, this.getConfig());
     }
-    depositeRenewFD(depositNumber, withDrawalAmt, newDepositAmt, depositTenure, depositPayFrequency, prodId) {
-        const data = {
+    depositeRenewFD(data) {
+        const dataBody = {
+            ...data,
             customerId: this.customerId,
-            purpose: 'CLOSED',
-            depositNumber,
-            withDrawalAmt,
-            newDepositAmt,
-            depositTenure,
-            depositPayFrequency,
-            prodId,
-        }
+        };
         console.log(data, this.customerId);
-        return axios.post(HOST + 'depositRenewFd', data, this.getConfig());
+        return axios.post(HOST + 'depositRenewFd', dataBody, this.getConfig());
     }
     applyLoan(depositNumber, loanAmt) {
         const data = {
@@ -67,13 +61,12 @@ class APIService {
         }
         return axios.post(HOST + 'loanAgainstDeposit', data, this.getConfig());
     }
-    depositClosure(depositNumber) {
-        const data = {
+    depositClosure(data) {
+        const bodyData = {
+            ...data,
             customerId: this.customerId,
-            purpose: 'CLOSED',
-            depositNumber,
         }
-        return axios.post(HOST + 'depositClosure', data, this.getConfig());
+        return axios.post(HOST + 'depositClosure', bodyData, this.getConfig());
     }
     fetchRequestStatus() {
         return axios.post(HOST + 'requestStatus', {customerId: this.customerId}, this.getConfig());
@@ -159,10 +152,17 @@ class APIService {
     }
     getSignedURL(docType, fileName) {
         const data ={
-            docType, fileName, customerId: this.customerId || 'c34234',
+            docType, fileName, customerId: this.customerId || (new Date().toISOString()),
         };
         console.log('getSignedURL', data);
         return axios.post(S3_SIGNED_URL + 'getSignedURL', data, this.getConfig());
+    }
+    sendSms(data) {
+        return axios.post(HOST + 'sendSms', data, this.getConfig());
+    }
+
+    checkMobileAppVersion() {
+        return axios.get(HOST + 'check-mobile-app-version', this.getConfig());
     }
 }
 export default new APIService();

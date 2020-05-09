@@ -59,7 +59,7 @@ const Certificate = ({
                                 )}
                             </View>
                         }
-                        panelTitleLabel={'Cerificate'}/>
+                        panelTitleLabel={'Certificate'}/>
                         {/* <View style={styles.actions}>
                             <Button info style={styles.actionBtn}>
                                 <Icon name='mail' style={styles.actionBtnIcon}/>
@@ -121,6 +121,15 @@ const styles = StyleSheet.create({
         height: 400,
         width: '100%'
     },
+    err: {
+        flexDirection: 'column',
+        alignItems: "center",
+        justifyContent: "center",   
+    },
+    errIcon: {
+        marginBottom: 21,
+        color: '#555',
+    }
 }); 
 
 export default Certificate;

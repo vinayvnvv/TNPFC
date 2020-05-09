@@ -7,10 +7,12 @@ import { CREATE_FD_STYLES } from './common-styles';
 import { createForm } from '../../lib/form';
 import { TextInput, TouchableOpacity } from 'react-native-gesture-handler';
 import FormItem from '../common/components/form-item';
-import { REGEX } from '../../constants';
+import { REGEX, TEXTS } from '../../constants';
 import * as ImagePicker from 'expo-image-picker';
 import CheckBox from '../common/components/checkbox';
 import { NAVIGATION } from '../../navigation';
+import { COMMON_STYLES } from '../common/styles';
+import utils from '../../services/utils';
 const TEXT_INPUT_TRIGGER = Platform.OS === 'web' ? 'onChange' : 'onChangeText';
 
 
@@ -81,20 +83,33 @@ class AddressInfo extends React.Component {
         setFieldValue(field, uri);
     }
     onUpload = (name, url) => {
-        const {form: {setFieldValue}} = this.props;
+        const {form: {setFieldValue, getFieldsValue}} = this.props;
         console.log('Upload - success', name, url);
-        setFieldValue('address_proof', url);
+        let value = getFieldsValue('address_proof');
+        if(!value) value = [url];
+        else value.push(url);
+        setFieldValue('address_proof', value);
     }
     uploadFile = () => {
-        const {navigation} = this.props;
+        const {
+            navigation,
+            form: {getFieldsValue},
+        } = this.props;
+        const addressValues = getFieldsValue('address_proof');
+        const s3Folder = Array.isArray(addressValues) ? 'address' + '-' + (addressValues.length + 1) : 'address-1';
         navigation.navigate(NAVIGATION.UPLOADER, {
             name: 'address',
             onUpload: this.onUpload,
-            s3Folder: 'address',
+            s3Folder,
             accept: ['image/jpeg', 'image/jpg', 'image/png', 'application/pdf'],
             invalidFileErrMsg: 'Please select only image/pdf file',
             helpText: '(Only Image/PDF files are allowed)',
         });
+    }
+    removeFile = (idx, values) => {
+        const {form: {setFieldValue}} = this.props;
+        values.splice(idx, 1);
+        setFieldValue('address_proof', values.length === 0 ? '' : values);   
     }
     render() {
         const {
@@ -106,18 +121,23 @@ class AddressInfo extends React.Component {
             states,
             districts,
             form: {
-                createField, getFieldsValue, errors,
+                createField, getFieldsValue, errors, setFieldValue,
             },
             addressProofDocs,
         } = this.props;
         const {sameAddress, isSubmit} = this.state;
-        // const errors = getErrors();
+
+        const addressProofValue = getFieldsValue('address_proof');
         {createField('address_proof', {
             initialValue: permanent && permanent.address_proof,
             rules: [
                 {required: true, message: 'Address proof required!'}
             ]
-        })}
+        })};
+
+
+        // const errors = getErrors();
+        
         return (
             <View style={styles.container}>
                 <View style={CREATE_FD_STYLES.section}>
@@ -214,7 +234,7 @@ class AddressInfo extends React.Component {
                         <View style={CREATE_FD_STYLES.section}>
                             <View style={CREATE_FD_STYLES.sectionTitleC}>
                                 <Text style={CREATE_FD_STYLES.sectionTitleCText}>Upload Address Proof</Text>
-                                {getFieldsValue('address_proof') ? (
+                                {/* {getFieldsValue('address_proof') ? (
                                     <Button 
                                         onPress={() => this.uploadFile()}
                                         info
@@ -222,7 +242,7 @@ class AddressInfo extends React.Component {
                                         style={styles.changeFileBtn}>
                                         <Text>Change</Text>
                                     </Button>
-                                ) : (<></>)}
+                                ) : (<></>)} */}
                             </View>
                             {createField('addressProofType', {
                                 trigger: 'onValueChange',
@@ -246,21 +266,45 @@ class AddressInfo extends React.Component {
                                     )}
                             </Picker>)}
                             <View style={CREATE_FD_STYLES.sectionContent}>
-                                {getFieldsValue('address_proof') ? (
+                                {addressProofValue ? (
                                     <>
-                                    <Image 
+                                    {/* <Image 
                                         source={{uri: getFieldsValue('address_proof')}} 
-                                        style={styles.panImage}/>
+                                        style={styles.panImage}/> */}
+                                        {addressProofValue && Array.isArray(addressProofValue) && addressProofValue.map((doc, idx) =>
+                                            <View style={COMMON_STYLES.uploadList} key={'proof-' + idx}>
+                                                <View style={COMMON_STYLES.uploadListType}>
+                                                    <Image style={COMMON_STYLES.uploadListTypeImage} source={
+                                                        utils.getFileImage(doc)
+                                                    }/>
+                                                </View>
+                                                <Text numberOfLines={1} style={COMMON_STYLES.uploadListText}>
+                                                    Upload Success
+                                                </Text>
+                                                <View style={COMMON_STYLES.uploadListAction}>
+                                                    <TouchableOpacity style={COMMON_STYLES.uploadListActionClose} onPress={() => this.removeFile(idx, addressProofValue)}>
+                                                        <Icon name={'close'} style={COMMON_STYLES.uploadListActionCloseIcon}/>
+                                                    </TouchableOpacity>
+                                                </View>
+                                            </View>
+                                        )}
                                     </>
                                 ) : (
                                     <TouchableOpacity onPress={() => this.uploadFile()}>
                                         <View style={styles.uploader}>
                                             <Icon style={styles.uploaderIcon} name={'cloud-upload'}/>
                                             <Text style={styles.uploaderText}>Upload Address Proof</Text>
+                                            <Text style={COMMON_STYLES.uploaderHelpText}>{TEXTS.UPLOAD_AREA_MSG}</Text>
                                         </View>
                                     </TouchableOpacity>
                                 )}
+                                {addressProofValue ? (
+                                    <Button block info onPress={this.uploadFile}>
+                                        <Text>Upload another file</Text>
+                                    </Button>
+                                ) : <View />}
                             </View>
+                            
                             {isSubmit && errors && errors['address_proof'] && !getFieldsValue('address_proof') && (
                                 <Text style={styles.err}>{errors['address_proof'][0].message}</Text>
                             )}

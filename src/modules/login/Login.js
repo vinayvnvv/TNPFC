@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, AsyncStorage, StyleSheet, TextInput, StatusBar, ScrollView, Image } from 'react-native';
+import { View, AsyncStorage, StyleSheet, TextInput, StatusBar, ScrollView, Image, Keyboard, Dimensions } from 'react-native';
 import {Button, Toast, Container, Header, Spinner, Text, Icon, Left, Body, Title, Item, Input, Label, Content} from 'native-base';
 import {connect} from 'react-redux';
 import { save } from '../../store/actions/test-actions';
@@ -10,6 +10,7 @@ import apiServices from '../../services/api-services';
 import icons from '../../../assets/icons';
 import utils from '../../services/utils';
 import { COMMON_STYLES } from '../common/styles';
+import { fetchCustomerDetails } from '../../store/actions/common-actions';
 const {THEME} = CONFIG.APP;
 
 const resendTime = 12000;
@@ -30,13 +31,37 @@ class Login extends React.Component {
         verifying: false,
         otpSending: false,
         errText: null,
+        keyboardOffset: 0,
     }
     intervalCouter;
     timeoutInstance;
     componentDidMount() {
-        AsyncStorage.getItem('cc').then((v) => {
-            this.setState({v: v});
-        })  
+        this.keyboardDidShowListener = Keyboard.addListener(
+            'keyboardDidShow',
+            this._keyboardDidShow,
+        );
+        this.keyboardDidHideListener = Keyboard.addListener(
+            'keyboardDidHide',
+            this._keyboardDidHide,
+        );
+    }
+
+    componentWillUnmount() {
+        this.keyboardDidShowListener.remove();
+        this.keyboardDidHideListener.remove();
+    }
+
+    _keyboardDidShow = (event) => {
+        console.log(event, Dimensions.get('screen'));
+        this.setState({
+            keyboardOffset: event.endCoordinates.height,
+        })
+    }
+
+    _keyboardDidHide = () => {
+        this.setState({
+            keyboardOffset: 0,
+        })
     }
 
     onFieldChange = (field, value) => {
@@ -47,15 +72,18 @@ class Login extends React.Component {
     }
 
     handleResendTimer = () => {
+        console.log('handleResendTimer', timer)
         this.intervalCouter = setInterval(() => {
             --timer;
             if(timer === 1) {
                 this.setState({
                     canReSendOtp: true,
                 });
-                timer = resendTime;
+                timer = (resendTime/1000);
+                console.log('clear', timer);
                 clearInterval(this.intervalCouter);
             }
+            console.log('time', timer);
             this.setState({
                 timer,
             });
@@ -209,11 +237,12 @@ class Login extends React.Component {
         })
     }
     onLogin = async (data) => {
-        const {setAuth} = this.props;
+        const {setAuth, fetchCustomerDetails} = this.props;
         const {response} = data || {};
         if(response) {
             await authServices.setAuth(response.authToken, response.customerId);
-            setAuth(response.authToken, response.customerId);
+            await setAuth(response.authToken, response.customerId);
+            fetchCustomerDetails();
         }
     }
     render() {
@@ -225,7 +254,7 @@ class Login extends React.Component {
                         <Text style={COMMON_STYLES.envInfoText}>Runing on Test ENV ({CONFIG.API.HOST})</Text> 
                     </View>
                 )}
-                <StatusBar backgroundColor={THEME.PRIMARY}/>
+                <StatusBar  backgroundColor={THEME.PRIMARY}/>
                 {/* <Header noLeft>
                     <Left />
                 <Body>
@@ -451,5 +480,5 @@ const mapStateToProps = state => ({
 
 export default connect(
     mapStateToProps,
-    {save, setAuth},
+    {save, setAuth, fetchCustomerDetails},
 )(Login)

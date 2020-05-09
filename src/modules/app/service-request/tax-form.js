@@ -103,7 +103,7 @@ const TaxForm = ({
                     <Picker.Item 
                         key={d.accountNumber + '-' + idx}
                         value={d.accountNumber} 
-                        label={d.accountNumber} />
+                        label={d.accountNumber + ' (' + utils.getAppCommonDateFormat(d.openDate) + ', ' + utils.convertToINRFormat(d.depositAmount) + ')'} />
                 )}
             </Picker>)}
             {createField('panNumber', {

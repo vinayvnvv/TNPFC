@@ -182,14 +182,16 @@ const styles = StyleSheet.create({
     },
     modalHeader: {
         fontSize: 13,
-        color: '#777',
-        fontWeight: '300',
+        // color: '#777',
+        color: THEME.PRIMARY_INVERT,
+        fontWeight: '700',
         textAlign: 'center',
         paddingVertical: 13,
         paddingHorizontal: 19,
         borderBottomColor: '#d9d9d955',
         borderBottomWidth: 1,
-        borderStyle: 'solid'
+        borderStyle: 'solid',
+        backgroundColor: THEME.PRIMARY,
     },
     typesItem: {
         flexDirection: 'row',
@@ -198,7 +200,7 @@ const styles = StyleSheet.create({
         paddingVertical: 13,
         borderBottomColor: '#d9d9d955',
         borderBottomWidth: 1,
-        borderStyle: 'solid'
+        borderStyle: 'solid',
     },
     typesItemIcon: {
         marginRight: 21,

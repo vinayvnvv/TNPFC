@@ -17,10 +17,12 @@ const PersonalInfo = ({
 }) => {
     const {
         depositAccountType,
+        accountNumber,
         jointHolder1,
         jointHolder2,
     } = fdSummary && fdSummary.length > 0 ? fdSummary[0] : {};
     let lists = [
+        ['Account No', accountNumber],
         ['First Depositor Name', customerName],
         ['Date of Birth', utils.getAppCommonDateFormat(dob)],
         ['Gender', 'Male'],

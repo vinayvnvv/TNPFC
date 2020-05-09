@@ -8,8 +8,11 @@ import { createForm } from '../../lib/form';
 import { Platform } from '@unimodules/core';
 import { CREATE_FD_STYLES } from './common-styles';
 import * as ImagePicker from 'expo-image-picker';
-import { REGEX } from '../../constants';
+import { REGEX, TEXTS } from '../../constants';
 import StepNavigation from './step-navigation';
+import { COMMON_STYLES } from '../common/styles';
+import { NAVIGATION } from '../../navigation';
+import moment from 'moment';
 
 const TEXT_INPUT_TRIGGER = Platform.OS === 'web' ? 'onChange' : 'onChangeText';
 const residenceOptions = [
@@ -34,8 +37,11 @@ const PersonalInfo = ({
     aadharStatus,
     validateAadhar,
     residentList,
+    navigation,
+    isSenior,
 }) => {
     const errors = getErrors() || {};
+    let uploadField;
     const [isSubmit, setIsSubmit] = useState(false);
     let panVal = false;
     const pickImage = async (field) => {
@@ -130,6 +136,20 @@ const PersonalInfo = ({
             }
         }
     }
+    const onUpload = (name, url) => {
+        setFieldValue(uploadField, url);
+    }
+    const uploadFile = field => {
+        uploadField = field;
+        navigation.navigate(NAVIGATION.UPLOADER, {
+            name: field,
+            onUpload: onUpload,
+            s3Folder: field,
+            accept: field === 'pan_image' ? ['image/jpeg', 'image/jpg', 'image/png', 'application/pdf'] : ['image/*'],
+            invalidFileErrMsg: 'Please select only image/pdf file',
+            helpText: field === 'pan_image' ? '(Only Image/PDF files are allowed)' : '(Only Images files are allowed',
+        });
+    }
     return (
         <View style={styles.container}>
             <View style={CREATE_FD_STYLES.section}>
@@ -163,12 +183,37 @@ const PersonalInfo = ({
 
                     {createField('dob', {
                         trigger: 'onDateChange',
-                        initialValue: Platform.OS === 'web' ? new Date('05-29-1967') : (data && data.dob),
+                        initialValue: Platform.OS === 'web' ? new Date('03-11-1981') : (data && data.dob),
                         localData: {
                             label: 'DOB',
                         },
                         rules: [
                             {required: true, message: 'DOB is required.'},
+                            {validator: (rule, value, callback) => {
+                                if(!isSenior) return true;
+                                else {
+                                    const selectedDate = moment(value);
+                                    const backDate = moment().subtract(58, 'years');
+                                    return !moment(selectedDate).isSameOrAfter(backDate);
+                                }
+                                
+                              },
+                              message: 'You have selected Senior Citizen but the DOB selected is lesser than 58 years. please deselect the Senior Citizen check box on the Calculator Page, and reinitiate the transaction.',
+                            },
+                            {
+                                validator: (rule, value, callback) => {
+                                    console.log(value);
+                                    if(isSenior) return true;
+                                    else {
+                                        const selectedDate = moment(value);
+                                        const backDate = moment().subtract(58, 'years');
+                                        console.log(selectedDate, backDate);
+                                        return !moment(selectedDate).isSameOrBefore(backDate);
+                                    }
+                                    
+                                  },
+                                  message: 'Based on DOB you are eligible for Senior Citizen Rates. To avail this benefit, please select the Senior Citizen check box on the Calculator Page, and reinitiate the transaction.',
+                            }
                         ],
                     })(<DatePicker placeHolderTextStyle={
                             Platform.OS !== 'web' ? {color: '#999'} : {}
@@ -310,7 +355,7 @@ const PersonalInfo = ({
                     <Text style={CREATE_FD_STYLES.sectionTitleCText}>Upload PAN (jpg, png, pdf)</Text>
                     {getFieldsValue('pan_image') ? (
                         <Button 
-                            onPress={() => pickImage('pan_image')}
+                            onPress={() => uploadFile('pan_image')}
                             info 
                             small
                             style={styles.changeFileBtn}>
@@ -327,10 +372,11 @@ const PersonalInfo = ({
                             style={styles.panImage}/>
                         </>
                     ) : (
-                        <TouchableOpacity onPress={() => pickImage('pan_image')}>
+                        <TouchableOpacity onPress={() => uploadFile('pan_image')}>
                             <View style={styles.uploader}>
                                 <Icon style={styles.uploaderIcon} name={'cloud-upload'}/>
                                 <Text style={styles.uploaderText}>Upload PAN</Text>
+                                <Text style={COMMON_STYLES.uploaderHelpText}>{TEXTS.UPLOAD_AREA_MSG}</Text>
                             </View>
                         </TouchableOpacity>
                     )}
@@ -345,7 +391,7 @@ const PersonalInfo = ({
                     <Text style={CREATE_FD_STYLES.sectionTitleCText}>Upload Depositor Photo</Text>
                     {getFieldsValue('profile_image') ? (
                         <Button 
-                            onPress={() => pickImage('profile_image')}
+                            onPress={() => uploadFile('profile_image')}
                             info
                             small 
                             style={styles.changeFileBtn}>
@@ -361,10 +407,11 @@ const PersonalInfo = ({
                             style={styles.profileImage}/>
                         </>
                     ) : (
-                        <TouchableOpacity onPress={() => pickImage('profile_image')}>
+                        <TouchableOpacity onPress={() => uploadFile('profile_image')}>
                             <View style={styles.uploader}>
                                 <Icon style={styles.uploaderIcon} name={'cloud-upload'}/>
                                 <Text style={styles.uploaderText}>Upload Depositor Photo</Text>
+                                <Text style={COMMON_STYLES.uploaderHelpText}>{TEXTS.UPLOAD_AREA_MSG}</Text>
                             </View>
                         </TouchableOpacity>
                     )}

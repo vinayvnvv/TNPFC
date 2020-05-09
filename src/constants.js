@@ -42,6 +42,7 @@ export const CONSTANTS = {
 
 const TEXTS = {
     TERMS: 'Click here to read the terms and conditions before you proceed to select payment type',
+    UPLOAD_AREA_MSG: '(Use camera to capture or upload file from mobile phone)',
 }
 
 const {REGEX} = CONSTANTS;

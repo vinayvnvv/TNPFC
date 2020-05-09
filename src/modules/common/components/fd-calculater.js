@@ -19,7 +19,7 @@ const schemeOptions = [
     {label: 'RIPS', value: 'rips'},
     {label: 'CIPS', value: 'cips'},
 ];
-const periodOptions = [
+export const periodOptions = [
     {label: '12', value: 12},
     {label: '24', value: 24},
     {label: '36', value: 36},
@@ -51,7 +51,7 @@ export const getInterestPayment = payment => {
 
 class FDCalculater extends React.Component {
     state = {
-        form: getFdCalcInitValues(),
+        form: this.props.initData || getFdCalcInitValues(),
         amountErr: false,
         periodOptionsData: periodOptions,
         interestOptionsData: interestOptions,

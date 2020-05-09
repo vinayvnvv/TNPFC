@@ -22,7 +22,9 @@ export const CONFIG = {
             ORANGE: '#eb9d3f',
             DANGER: '#ce3c3e',
             INFO: '#17a2b8'
-        }
+        },
+        APP_ACTIVE_TIME_MINS: 15,
+        APP_VERSION: Constants.manifest.version,
     },
     API: {
         HOST: ENV.HOST,

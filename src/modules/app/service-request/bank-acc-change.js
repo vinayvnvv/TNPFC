@@ -9,13 +9,15 @@ import utils from '../../../services/utils';
 import FormItem from '../../common/components/form-item';
 import { createForm } from '../../../lib/form';
 import { StyleSheet, Platform, Alert, Image } from 'react-native';
-import { REGEX } from '../../../constants';
+import { REGEX, TEXTS } from '../../../constants';
 import moment from 'moment';
 import { SERV_REQ_STYLES } from './service-req-styles';
 import OTPVerify from './otp-verify';
 import { THEME } from '../../../../config';
 import * as ImagePicker from 'expo-image-picker';
 import { CREATE_FD_STYLES } from '../../create-fd/common-styles';
+import { COMMON_STYLES } from '../../common/styles';
+import { NAVIGATION } from '../../../navigation';
 const TEXT_INPUT_TRIGGER = Platform.OS === 'web' ? 'onChange' : 'onChangeText';
 
 const steps = [
@@ -77,6 +79,21 @@ const BankAccChange = ({
             
         }
     }
+
+    const onUpload = (name, url) => {
+        setFieldValue('imagePath', url);
+    }
+    const uploadFile = () => {
+        navigation.navigate(NAVIGATION.UPLOADER, {
+            name: 'bank_acc',
+            onUpload: onUpload,
+            s3Folder: 'bank_acc',
+            accept: ['image/jpeg', 'image/jpg', 'image/png', 'application/pdf'],
+            invalidFileErrMsg: 'Please select only image/pdf file',
+            helpText: '(Only Image/PDF files are allowed)',
+        });
+    }
+
     const pickImage = async (field) => {
         let options = {
             mediaTypes: ImagePicker.MediaTypeOptions.Images,
@@ -109,7 +126,7 @@ const BankAccChange = ({
 
         let data = {
             ...values,
-            imagePath: 'link',
+            imagePath: values.imagePath,
             "serviceType":"bankDetailsChange",
             customerId: customerId,
         };
@@ -272,7 +289,7 @@ const BankAccChange = ({
                             <Text style={CREATE_FD_STYLES.sectionTitleCText}>Upload Bank Chequec</Text>
                             {getFieldsValue('imagePath') ? (
                                 <Button 
-                                    onPress={() => pickImage('imagePath')}
+                                    onPress={() => uploadFile()}
                                     info
                                     small 
                                     style={styles.changeFileBtn}>
@@ -288,10 +305,11 @@ const BankAccChange = ({
                                     style={styles.pic}/>
                                 </>
                             ) : (
-                                <TouchableOpacity onPress={() => pickImage('imagePath')}>
+                                <TouchableOpacity onPress={() => uploadFile()}>
                                     <View style={styles.uploader}>
                                         <Icon style={styles.uploaderIcon} name={'cloud-upload'}/>
                                         <Text style={styles.uploaderText}>Upload Bank Cheque</Text>
+                                        <Text style={COMMON_STYLES.uploaderHelpText}>{TEXTS.UPLOAD_AREA_MSG}</Text>
                                     </View>
                                 </TouchableOpacity>
                             )}

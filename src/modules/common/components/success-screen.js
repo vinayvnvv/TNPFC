@@ -6,16 +6,27 @@ import { THEME } from '../../../../config';
 const SuccessScreen = ({
     refNumber,
     successText,
+    warning,
 }) => {
     return (
         <Container>
             <View style={styles.container}>
-                <View style={styles.iconContainer}>
-                    <Icon style={styles.icon} name={'checkmark'}/>
+                <View style={[
+                        styles.iconContainer, 
+                        warning ? styles.iconContainerWarning : {}
+                    ]}>
+                    {warning ? (
+                        <Icon style={[styles.icon, {color: THEME.ORANGE}]} name={'ios-information'}/>) : (
+                        <Icon style={styles.icon} name={'checkmark'}/>
+                    )}
                 </View>
                 <Text style={styles.successText}>{successText}</Text>
-                <Text style={styles.refText}>Your reference number</Text>
-                <Text style={styles.refNum}>{refNumber}</Text>
+                {refNumber && (
+                    <>
+                        <Text style={styles.refText}>Your reference number</Text>
+                        <Text style={styles.refNum}>{refNumber}</Text>
+                    </>
+                )}
                 <Button style={styles.btn} success block>
                     <Text>OK</Text>
                 </Button>
@@ -42,6 +53,9 @@ const styles = StyleSheet.create({
         borderWidth: 3,
         borderStyle: 'solid',
         borderRadius: 62,
+    },
+    iconContainerWarning: {
+        borderColor: THEME.ORANGE,
     },
     icon: {
         color: THEME.SUCCESS,

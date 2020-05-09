@@ -67,7 +67,7 @@ class MyLoans extends React.Component {
                         <Right />
                     </Header>
                     <Container style={styles.container}>
-                        {fdLoans && fdLoans.length !== undefined  && fdLoans.length > 0 && (
+                        {fdLoans && fdLoans.length !== undefined  && fdLoans.length > 0 ? (
                             <FlatList
                                 data={fdLoans}
                                 // ListHeaderComponent={<ListHeader headerList={headerList}/>}
@@ -78,6 +78,12 @@ class MyLoans extends React.Component {
                                 )}
                                 keyExtractor={item => item.loanAccountNumber}
                             />
+                        ) : (
+                            <Container>
+                                <View style={COMMON_STYLES.spinnerContainerFullScreen}>
+                                    <Text style={COMMON_STYLES.spinnerContainerFullScreenText}>No records found.</Text>
+                                </View>
+                            </Container>
                         )} 
                     </Container>
                 </Container>

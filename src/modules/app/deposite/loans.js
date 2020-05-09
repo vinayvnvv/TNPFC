@@ -18,9 +18,11 @@ const Loans = ({
         interestPaid,
         maturityDate,
         interestRatePercent,
+        intpayFrequency,
         maturityAmount,
         openDate,
         tenure,
+        accountNumber,
         isLoanEligible,
     } = fdSummary.length > 0 ? fdSummary[0] : {};
     const {
@@ -84,12 +86,13 @@ const Loans = ({
                                 itemWidth={'50%'}
                                 noHoverEffect={true}
                                 lists={[
+                                    ['Account No', accountNumber],
                                     ['Start Date', utils.getAppCommonDateFormat(openDate)],
                                     ['Maturity Date', utils.getAppCommonDateFormat(maturityDate)],
-                                    ['Interest Payment', interestPaid],
-                                    ['Deposit Amount', depositAmount],
-                                    ['Maturity Amount', maturityAmount],
-                                    ['Interest Rate', interestRatePercent],
+                                    ['Interest Payment', intpayFrequency],
+                                    ['Deposit Amount', utils.convertToINRFormat(depositAmount)],
+                                    ['Maturity Amount', utils.convertToINRFormat(maturityAmount)],
+                                    ['Interest Rate', interestRatePercent + '%'],
                                     ['Duration (Months)', tenure]
                                 ]}
                                 panelTitleLabel={'Scheme Name'}

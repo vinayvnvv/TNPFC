@@ -31,7 +31,10 @@ class FDCalc extends React.Component {
         selected: '',
         acceptTerms: false,
         maturityAmount: 0,
-        form: getFdCalcInitValues(),
+        form: {
+            ...getFdCalcInitValues(),
+            isSenior: this.props.userDetails && this.props.userDetails['customerCategory'] !== 'GENERAL_CATEGROY',
+        },
         maturityDate: null,
         formErr: false,
         paymentType: 'rtgs',
@@ -271,6 +274,7 @@ class FDCalc extends React.Component {
                 amount,
                 interest,
             },
+            form,
             maturityDate,
             periodOptionsData,
             interestOptionsData,
@@ -316,7 +320,7 @@ class FDCalc extends React.Component {
                         </View>
                         {currentStep === 0 && (
                             <ScrollView style={styles.content}> 
-                                <FDCalculater onChange={this.onCalcValueChange} productDetails={productDetails}/>
+                                <FDCalculater initData={form} onChange={this.onCalcValueChange} productDetails={productDetails}/>
                                 {/* <View style={styles.calc}>
                                     <View style={styles.formRH}>
                                         <View style={styles.formRHF}>

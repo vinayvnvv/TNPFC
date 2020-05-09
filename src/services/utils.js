@@ -1,8 +1,15 @@
 import moment from 'moment';
-import { Linking } from 'react-native';
+import { Linking, Platform } from 'react-native';
 import { CONFIG } from './../../config';
+import icons from '../../assets/icons';
+import * as MediaLibrary from 'expo-media-library';
+import * as FileSystem from 'expo-file-system';
+import * as Permissions from 'expo-permissions';
+import { Toast } from 'native-base';
+import { Linking as ExpoLinking } from 'expo';
 class Utils {
     getAppCommonDateFormat(date) {
+        if(!this.isIsoDate(date)) return date;
         return moment(date ? date : new Date()).format('DD-MMM-YYYY');
     }
     getBoxShadow(radius, color, opacity) {
@@ -137,6 +144,87 @@ class Utils {
 
         isProductionEnv(host) {
             return (host || '').indexOf('portal-api') !== -1;
+        }
+
+        findArrayIndexWithAttr(array, attr, value) {
+            for(var i = 0; i < array.length; i += 1) {
+                if(array[i][attr] === value) {
+                    return i;
+                }
+            }
+            return -1;
+        }
+
+        getFileType(uri) {
+            if(uri) {
+                return uri.split('.').pop();
+            } else {
+                return 'unknown';
+            }
+        }
+        getFileImage(uri) {
+            const type = this.getFileType(uri);
+            if(type === 'pdf') {
+                return icons.PdfIcon;
+            }
+            if(type === 'png' || type === 'jpg' || type === 'jpeg') {
+                return {uri};
+            }
+        }
+        isIsoDate(str) {
+            if (/\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}.\d{3}Z/.test(str)) return true;
+            return false;
+        }
+        downloadFile(url, callback) {
+            if(Platform.OS === 'web') {
+                window.open(url, '_blank');
+                callback(true);
+            }
+            const uri = url ? url : "https://d6m921ss8dr76.cloudfront.net/paymentAdvice/TNPFCL1588661289237966-paymentAdvice.pdf";
+            let fileUri = FileSystem.documentDirectory + uri.split('/').pop();
+            FileSystem.downloadAsync(uri, fileUri)
+            .then(({ uri }) => {
+                this.saveFile(uri, callback);
+              })
+              .catch(error => {
+                console.error(error);
+                callback(true);
+              })
+        }
+        
+        saveFile = async (fileUri, callback) => {
+            const { status } = await Permissions.askAsync(Permissions.CAMERA_ROLL);
+            if (status === "granted") {
+                const asset = await MediaLibrary.createAssetAsync(fileUri);
+                // console.log(asset)
+                // const uriArr = asset.uri.split('/');
+                // const fileN = uriArr.pop();
+                // uriArr.pop();
+                // const loc = uriArr.join('/') + '/Download/' + fileN;
+                // const a = await MediaLibrary.createAlbumAsync("Download", asset, false);
+                // console.log(loc, a);
+                callback(false, asset);
+                Toast.show({
+                    text: 'Saved to Downloads.',
+                    position: 'bottom',
+                    duration: 5000,
+                    buttonText: 'CLOSE',
+                    buttonTextStyle: {
+                        fontWeight: '700',
+                    },
+                });
+            }
+        }
+
+        isOldVersion(versionData = {}) {
+            console.log('checking version ', versionData, CONFIG.APP.APP_VERSION);
+            if(Platform.OS === 'ios') {
+                const {version} = versionData['ios'];
+                if(version !== CONFIG.APP.APP_VERSION) return true;
+            } else {
+                const {version} = versionData['android'];
+                if(version !== CONFIG.APP.APP_VERSION) return true;
+            }
         }
 }
 

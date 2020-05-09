@@ -2,7 +2,7 @@ import React from 'react';
 import {connect} from 'react-redux';
 import { Button, Icon, Left, Right, Header, Container, Body, Title } from 'native-base';
 import { CONFIG } from '../../../../config';
-import {View, StyleSheet, ScrollView} from 'react-native';
+import {View, StyleSheet, ScrollView, Alert, Platform} from 'react-native';
 import DashBoardListItem from './list-item';
 import { NAVIGATION } from '../../../navigation';
 import icons from '../../../../assets/icons';
@@ -18,14 +18,14 @@ import authServices from '../../../services/authServices';
 
 const lists = [
     {name: 'Fixed Deposit', navigation: NAVIGATION.DEPOSITE_LIST, icon: icons.FDIcon},
-    {name: 'Loan Request', icon: icons.LoanReqIcon, navigation: NAVIGATION.COMMING_SOON},
+    // {name: 'Loan Request', icon: icons.LoanReqIcon, navigation: NAVIGATION.COMMING_SOON},
     {name: 'My Loans', navigation: NAVIGATION.MY_LOANS, icon: icons.MyLoansIcon},
     {name: 'New Fixed Deposit', icon: icons.FDCalcIcon, navigation: NAVIGATION.FD_CALCULATER},
     {name: 'Certificate', icon: icons.CertificateIcon, navigation: NAVIGATION.CERTIFICATE_LIST},
     // {name: 'Activity', icon: icons.ActivityIcon},
     // {name: 'Application Status', icon: icons.AppStatusIcon},
     {name: 'Service Request', navigation: NAVIGATION.SERVICE_REQUEST, icon: icons.ServiceReqIcon},
-    {name: 'Tax Documents', icon: icons.ReportsIcon, navigation: NAVIGATION.COMMING_SOON},
+    // {name: 'Tax Documents', icon: icons.ReportsIcon, navigation: NAVIGATION.COMMING_SOON},
     {name: 'Profile', icon: icons.ReportsIcon, navigation: NAVIGATION.PROFILE},
 ];
 
@@ -49,6 +49,25 @@ class DashBoard extends React.Component {
             removeAuth();
         }
     }
+    // () => this.onDropDownSelect(menus[1].title)
+    confirmLogOut = () => {
+        if(Platform.OS === 'web') {
+            const res = confirm('Confirm?');
+            if(res) this.onDropDownSelect(menus[1].title)
+            return;
+        }
+        Alert.alert(
+            'Confirm?', 'Please confirm to logout',
+            [
+                {text: 'Logout', onPress: () => {
+                    this.onDropDownSelect(menus[1].title)
+                }},
+                {text: 'Cancel', onPress: () => {
+
+                }}
+            ]
+        )
+    }
     render() {
         return (
             <Container>
@@ -58,7 +77,7 @@ class DashBoard extends React.Component {
                     <Title>{CONFIG.APP.TITLE}</Title>
                 </Body>
                     <Right>
-                        <Button transparent onPress={() => this.onDropDownSelect(menus[1].title)}>
+                        <Button transparent onPress={this.confirmLogOut}>
                             <Icon name='power' />
                         </Button>
                         {/* <Button transparent>

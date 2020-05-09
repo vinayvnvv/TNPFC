@@ -80,8 +80,8 @@ const PaymentSection = ({
                             lists={[
                                 ['Deposit Amount', fdCalc.amount],
                                 ['Maturity Date', fdCalc.maturityDate],
-                                ['First Name', personalInfo.first_name],
-                                ['Last Name', personalInfo.last_name],
+                                ['Full Name', personalInfo.first_name],
+                                // ['Last Name', personalInfo.last_name],
                                 ['Mobile Number', personalInfo.mobile],
                                 ['PAN Number', personalInfo.pan]
                             ]}/>

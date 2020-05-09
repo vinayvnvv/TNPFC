@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { StyleSheet } from 'react-native';
 import { View, Text, Picker } from 'native-base';
 import {THEME} from './../../../../config';
+import utils from '../../../services/utils';
 
 const SelectAccount = ({
     accounts,
@@ -30,7 +31,7 @@ const SelectAccount = ({
                                     <Picker.Item label="Select Account" value={''} color={'#c9c9c9'} />
                                     {accounts && accounts.map((a, idx) => 
                                         <Picker.Item 
-                                            label={a.accountNumber} 
+                                            label={a.accountNumber + ' (' + utils.getAppCommonDateFormat(a.openDate) + ', ' + utils.convertToINRFormat(a.depositAmount) + ')'} 
                                             key={a.accountNumber + '-' + idx}
                                             value={a.accountNumber}/>
                                 )}

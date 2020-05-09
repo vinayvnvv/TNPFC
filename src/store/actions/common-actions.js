@@ -202,3 +202,23 @@ export const getAddressProofDocList = () => {
         })
     }
 }
+
+export const checkMobileAppVersion = () => {
+    return (dispatch) => {
+        // setTimeout(()=>{
+        //     dispatch({
+        //         type: COMMON.ON_MOBILE_APP_VERSION_CHECK,
+        //         payload: {"ios":{"version":"1.7.0","updateTitle":"New Version Found","updateDesc":"Please Update the app to newer version","actions":[{"text":"Update","link":"http://google.com"}],"updateFeatures":["Added QR Code","Added Closed FD"]},"android":{"version":"1.8.0","updateTitle":"New Version Found (1.7.0)","updateDesc":"To use the app, please update to the newer version(1.7.0)","actions":[{"text":"Update","link":"http://google.com","theme":"info"},{"text":"See WebView","link":"http://google.com","theme":"warning"}],"updateFeatures":["Added QR Code","Added Closed FD"]}},
+        //     });
+        // }, 1000);
+        apiServices.checkMobileAppVersion().then(res => {
+            const {data} = res;
+            if(data && data.responseCode == '200') {
+                dispatch({
+                    type: COMMON.ON_MOBILE_APP_VERSION_CHECK,
+                    payload: data.response,
+                });
+            }
+        })
+    }
+}

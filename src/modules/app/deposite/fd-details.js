@@ -16,6 +16,7 @@ import Closure from './closure';
 import { fetchFDSummary, fetchFdLoans } from '../../../store/actions/deposite-actions';
 import { COMMON_STYLES } from '../../common/styles';
 import apiServices from '../../../services/api-services';
+import update from 'immutability-helper';
 const TabBar = ({
     tabs,
     goToPage,
@@ -50,6 +51,53 @@ class FDDetails extends React.Component {
         pageInit: false,
         renewFDScreenStatus: null,
         applyLoanStatus: null,
+        topMostElements: [],
+    }
+    TopMostElement = {
+        register: async (arr) => {
+            if(arr && Array.isArray(arr)) {
+                for(let i=0;i<arr.length;i++) {
+                    const {key, component} = arr[i];
+                    console.log('register', key, component);
+                    const exists = this.state.topMostElements.filter(e => e.key === key)[0];
+                    if(!exists) {
+                        const itm = {key, component, visible: false};
+                        console.log('adding top most to arr', itm);
+                        await this.setState({
+                            topMostElements: [
+                                ...this.state.topMostElements,
+                                itm,
+                            ]
+                        });
+                    }
+                }
+            }
+            
+        },
+        show: key => {
+            console.log('show', key);
+            const index = utils.findArrayIndexWithAttr(this.state.topMostElements, 'key', key);
+            if(index !== -1) {
+                const itm = {...this.state.topMostElements[index], visible: true};
+                this.setState(update(this.state, {topMostElements: {
+                    [index]: {
+                        $set: itm,
+                    }
+                }}));
+            }
+        },
+        close: key => {
+            console.log('close', key);
+            const index = utils.findArrayIndexWithAttr(this.state.topMostElements, 'key', key);
+            if(index !== -1) {
+                const itm = {...this.state.topMostElements[index], visible: false};
+                this.setState(update(this.state, {topMostElements: {
+                    [index]: {
+                        $set: itm,
+                    }
+                }}));
+            }
+        }
     }
     componentDidMount() {
         this.initPageData();
@@ -76,16 +124,25 @@ class FDDetails extends React.Component {
         navigation.goBack();
     }
 
-    onRenewFD = () => {
-        const {fdSummary} = this.props;
-        const depositNumber = fdSummary && fdSummary[0] && fdSummary[0].accountNumber;
+    onRenewFD = values => {
         this.setState({
             renewFDScreenStatus: {type: 'renew', status: 'loading'},
         });
-        apiServices.depositeRenewFD(depositNumber, '2233', '31232', '24', 'monthly', '202').then(res => {
+        console.log('onRenewFD', values);
+        const data = {
+            purpose: 'RENEWAL',
+            depositNumber: values.depositNumber,
+            withDrawalAmt: values.withDrawalAmt,
+            newDepositAmt: values.newDepositAmt,
+            depositTenure: values.period,
+            depositPayFrequency: values.depositPayFrequency,
+            prodId: values.prodId,
+            renewCloseFdUrl: values.renewCloseFdUrl.map(i=>({url: i})),
+        };
+        apiServices.depositeRenewFD(data).then(res => {
             console.log('res-->', res);
             const {data} = res;
-            if(data.responseCode === '200') {
+            if(data.responseCode == '200') {
                 this.setState({renewFDScreenStatus: {type: 'renew', status: 'success', data: data.response}})
             } else {
                 this.setState({
@@ -109,7 +166,7 @@ class FDDetails extends React.Component {
         apiServices.applyLoan(depositNumber, loanAmt).then(res => {
             console.log('res-->', res);
             const {data} = res;
-            if(data.responseCode === '200' || data.response) {
+            if(data.responseCode == '200' || data.response) {
                 this.setState({applyLoanStatus: {type: 'applyLoan', status: 'success', data: data.response}})
             } else {
                 this.setState({
@@ -124,16 +181,20 @@ class FDDetails extends React.Component {
         });
     }
 
-    depositClosure = () => {
-        const {fdSummary} = this.props;
-        const depositNumber = fdSummary && fdSummary[0] && fdSummary[0].accountNumber;
+    depositClosure = values => {
         this.setState({
             depositClosureStatus: {type: 'depositClosure', status: 'loading'},
         });
-        apiServices.depositClosure(depositNumber).then(res => {
+        const data = {
+            ...values,
+            renewCloseFdUrl: values.renewCloseFdUrl.map(i=>({url: i})),
+            purpose: 'CLOSURE',
+            depositNumber: values.depositNumber,
+        };
+        apiServices.depositClosure(data).then(res => {
             console.log('res-->', res);
             const {data} = res;
-            if(data.responseCode === '200') {
+            if(data.responseCode == '200') {
                 this.setState({depositClosureStatus: {type: 'depositClosure', status: 'success', data: data.response}})
             } else {
                 this.setState({
@@ -150,11 +211,15 @@ class FDDetails extends React.Component {
 
 
     render() {
-        const {pageInit, renewFDScreenStatus, applyLoanStatus, depositClosureStatus} = this.state;
-        const {fdSummary, userDetails, fdLoans} = this.props;
+        const {pageInit, renewFDScreenStatus, applyLoanStatus, depositClosureStatus, topMostElements} = this.state;
+        const {fdSummary, userDetails, fdLoans, navigation} = this.props;
+        console.log(topMostElements);
         return (
             pageInit ? (
                 <Container>
+                    {topMostElements.filter(e => e.visible).map((el, index) => 
+                        <el.component key={index + 'dd'} />
+                    )}
                     <Header>
                         <Left>
                             <Button transparent onPress={this.goBack}>
@@ -167,7 +232,9 @@ class FDDetails extends React.Component {
                         <Right />
                     </Header>
                     <Container>
-                        <Tabs renderTabBar={() => <TabBar />}>
+                        <Tabs 
+                            renderTabBar={() => <TabBar />}
+                            >
                             <ScrollView heading={'FD Summary'}>
                                 <FDSummary fdSummary={fdSummary}/>
                             </ScrollView>
@@ -180,9 +247,11 @@ class FDDetails extends React.Component {
                             <ScrollView heading="Certificate">
                                 <Certificate fdSummary={fdSummary} />
                             </ScrollView>
-                            <ScrollView heading="Re-new FD">
+                            <ScrollView heading="Renew-FD">
                                 <RenewFD 
                                     onRenewFD={this.onRenewFD}
+                                    navigation={navigation}
+                                    TopMostElement={this.TopMostElement}
                                     status={renewFDScreenStatus} 
                                     fdSummary={fdSummary}/>
                             </ScrollView>
@@ -196,6 +265,8 @@ class FDDetails extends React.Component {
                             <ScrollView heading="Closure">
                                 <Closure 
                                     status={depositClosureStatus}
+                                    navigation={navigation}
+                                    TopMostElement={this.TopMostElement}
                                     depositClosure={this.depositClosure}
                                     fdSummary={fdSummary}/>
                             </ScrollView>

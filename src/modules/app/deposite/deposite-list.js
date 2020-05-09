@@ -1,6 +1,6 @@
 import React from 'react';
 import {connect} from 'react-redux';
-import { Container, Text, Button, Icon, Left, Right, Header, Body, Title} from 'native-base';
+import { Container, Text, Button, Icon, Left, Right, Header, Body, Title, Spinner} from 'native-base';
 import {
     SafeAreaView,
     TouchableOpacity,
@@ -14,6 +14,7 @@ import {fetchAllDeposites} from './../../../store/actions/deposite-actions';
 import utils from '../../../services/utils';
 import icons from '../../../../assets/icons';
 import { NAVIGATION } from '../../../navigation';
+import FlexBox from '../../common/components/FlexBox';
 
 const {THEME} = CONFIG.APP;
 
@@ -24,6 +25,7 @@ const Item = ({
         openDate,
         maturityDate,
         accountStatus,
+        accountNumber,
     } = {},
     onPress,
 }) => (
@@ -36,6 +38,14 @@ const Item = ({
                 </View>
                 <View style={styles.listItemBottom}>
                     <View style={styles.listItemDRow}>
+                        <Text style={styles.listItemDRowLabel}>Account No</Text>
+                        <Text style={styles.listItemDRowValue}>{accountNumber}</Text>
+                    </View>
+                    <View style={styles.listItemDRow}>
+                        <Text style={styles.listItemDRowLabel}>Status</Text>
+                        <Text style={styles.listItemDRowValue}>{accountStatus}</Text>
+                    </View>
+                    <View style={styles.listItemDRow}>
                         <Text style={styles.listItemDRowLabel}>Start Date</Text>
                         <Text style={styles.listItemDRowValue}>{utils.getAppCommonDateFormat(openDate)}</Text>
                     </View>
@@ -43,17 +53,13 @@ const Item = ({
                         <Text style={styles.listItemDRowLabel}>Maturity Date</Text>
                         <Text style={styles.listItemDRowValue}>{utils.getAppCommonDateFormat(maturityDate)}</Text>
                     </View>
-                    <View style={styles.listItemDRow}>
-                        <Text style={styles.listItemDRowLabel}>Status</Text>
-                        <Text style={styles.listItemDRowValue}>{accountStatus}</Text>
-                    </View>
                 </View>
             </View>
         </TouchableOpacity>
     </View>
 );
 const getActiveColor = status => {
-    if(status) return {color: THEME.PRIMARY, fontWeight: '900'};
+    if(status) return {color: THEME.PRIMARY, fontWeight: '700'};
     else return {};
 }
 const ListHeader = ({headerList, onPress, selectedIndex}) => (
@@ -112,9 +118,9 @@ export class DepositeList extends React.Component {
         });
         return [
             {title: 'ALL', count: all, icon: icons.AllDepositeIcon},
+            {title: 'Active FD', count: active, icon: icons.ActiveFDIcon},
             {title: 'Matured FD', count: matured, icon: icons.MaturedDepositeIcon},
             {title: 'Closed FD', count: closed, icon: icons.ClosedFdIcon},
-            {title: 'Active FD', count: active, icon: icons.ActiveFDIcon},
         ]
     }
     onHeaderItemPress = index => {
@@ -134,6 +140,7 @@ export class DepositeList extends React.Component {
         const {selectedFilterIndex} = this.state;
         const headerList = this.getHeaderList(depositeList);
         const depositeFilterList = this.filterDepositeList(depositeList);
+        console.log('depositeFilterList', depositeFilterList);
         return (
             <Container>
                 <Header>
@@ -148,6 +155,12 @@ export class DepositeList extends React.Component {
                     <Right />
                 </Header>
                 <SafeAreaView style={styles.container}>
+                    {(!depositeFilterList || depositeFilterList.length === 0) && (
+                        <ListHeader 
+                            onPress={this.onHeaderItemPress} 
+                            selectedIndex={selectedFilterIndex}
+                            headerList={headerList}/>
+                    )}
                     {depositeFilterList && depositeFilterList.length !== undefined  && depositeFilterList.length > 0 && (
                         <FlatList
                             data={depositeFilterList}
@@ -166,6 +179,19 @@ export class DepositeList extends React.Component {
                             keyExtractor={item => item.accountNumber}
                         />
                     )}
+
+                    {!depositeList && <FlexBox 
+                                        height={200} 
+                                        centered 
+                                        marginTop={100}><Spinner color={THEME.PRIMARY}/>
+                                    </FlexBox>}
+                    {depositeList && !Array.isArray(depositeList) && 
+                                    <FlexBox 
+                                        height={200} 
+                                        centered 
+                                        marginTop={100}>
+                                            <Text>No Data Found!</Text>
+                                    </FlexBox>}
                     
                 </SafeAreaView>
             </Container>
@@ -253,11 +279,13 @@ const styles = StyleSheet.create({
     listItemBottom: {
         paddingHorizontal: listItemPadding - 5,
         paddingVertical: listItemPadding + 7,
+        paddingBottom: 0,
         borderTopColor: '#e6e6e6',
         borderTopWidth: 1,
         borderStyle: 'solid',
         flexDirection: 'row',
-        backgroundColor: "#ffffff"
+        backgroundColor: "#ffffff",
+        flexWrap: 'wrap'
     },
     listItemTitle: {
         color: THEME.PRIMARY,
@@ -270,8 +298,9 @@ const styles = StyleSheet.create({
         marginTop: 2,
     },
     listItemDRow: {
-        width: '33%',
-        paddingHorizontal: 5
+        width: '50%',
+        paddingHorizontal: 5,
+        marginBottom: 17,
     },
     listItemDRowLabel: {
         fontSize: 12,

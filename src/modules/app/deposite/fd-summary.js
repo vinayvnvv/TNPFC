@@ -90,7 +90,7 @@ const FDSummary = ({
                                 <Text style={styles.chartTLText}>Deposit Amount</Text>
                             </View>
                             <View style={styles.chartTV}>
-                                <Text style={styles.chartTVText}>{depositAmount}</Text>
+                                <Text style={styles.chartTVText}>{utils.convertToINRFormat(depositAmount)}</Text>
                             </View>
                         </View>
                         <View style={[styles.chartTI, styles.chartTISuccess]}>
@@ -98,7 +98,7 @@ const FDSummary = ({
                                 <Text style={styles.chartTLText}>Interest Amount</Text>
                             </View>
                             <View style={styles.chartTV}>
-                                <Text style={styles.chartTVText}>{interestAmount}</Text>
+                                <Text style={styles.chartTVText}>{utils.convertToINRFormat(interestAmount)}</Text>
                             </View>
                         </View>
                     </View>

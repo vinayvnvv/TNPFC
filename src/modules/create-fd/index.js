@@ -15,7 +15,7 @@ import moment from 'moment';
 import apiServices from '../../services/api-services';
 import NomineeInfo from './nominee-info';
 import PaymentSection from './payment-section';
-import { getInterestPayment } from '../common/components/fd-calculater';
+import { getInterestPayment, getFdCalcInitValues } from '../common/components/fd-calculater';
 import { NAVIGATION } from '../../navigation';
 import TermsConditions from '../common/components/terms-condtions';
 
@@ -35,7 +35,7 @@ class CreateFD extends React.Component {
         otpStatus: null,
         // otpStatus: 'ok',
         data: {
-            fdCalc: {},
+            fdCalc: getFdCalcInitValues,
             personalInfo: {},
             addressInfo: {},
             nomineeInfo: {},
@@ -285,6 +285,7 @@ class CreateFD extends React.Component {
             perCity: permanent.city,
             perpinCode: permanent.pincode,
             addressProofType: permanent.addressProofType,
+            addProofurl: permanent.address_proof.map(i=>({url: i})),
         };
         if(!same && other) {
             address = {
@@ -336,9 +337,8 @@ class CreateFD extends React.Component {
             nomineeName: nominee.name,
             nomineeDob: moment(nominee.dob).format('DD-MMM-YYYY'),
             nomineeRelationship: nominee.relationship,
-            idProofUrl: 'url',
-            profilePicUrl: 'url',
-            addProofurl: 'url',
+            idProofUrl: personalInfo.pan_image,
+            profilePicUrl: personalInfo.profile_image,
             ...gurdianData,
             ...address,
             verifiedPAN: panStatusCode === 1 ? 'Y' : 'N',
@@ -495,6 +495,8 @@ class CreateFD extends React.Component {
             case 1:
                 return <PersonalInfo 
                         data={personalInfo}
+                        isSenior={fdCalc.isSenior}
+                        navigation={navigation}
                         validatePan={this.validatePan}
                         validateAadhar={this.validateAadhar}
                         aadharStatus={aadharStatus}
