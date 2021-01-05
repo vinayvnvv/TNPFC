@@ -17,7 +17,7 @@
     "@react-navigation/native": "^5.0.7",
     "@react-navigation/stack": "^5.0.9",
     "async-validator": "^3.2.4",
-    "axios": "^0.19.2",
+    "axios": "^0.21.1",
     "expo": "~36.0.0",
     "expo-barcode-scanner": "~8.0.0",
     "expo-document-picker": "~8.0.0",
